@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rekap Presensi - SMP Islam Cipaku</title>
+
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="https://unpkg.com/jspdf@4.2.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://unpkg.com/jspdf-autotable@5.0.5/dist/jspdf.plugin.autotable.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7f5;
+      color: #222;
+      padding: 15px;
+    }
+    .container { max-width: 980px; margin: auto; }
+    .header { text-align: center; margin-bottom: 16px; }
+    h1 { color: #1b5e20; margin: 0 0 4px; font-size: 25px; }
+    h2 { margin: 0; color: #555; font-size: 17px; }
+    .card {
+      background: white;
+      border-radius: 15px;
+      padding: 17px;
+      margin-bottom: 14px;
+      box-shadow: 0 3px 10px rgba(0,0,0,.07);
+    }
+    .petugas {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: #e8f5e9;
+      border-radius: 12px;
+      margin-bottom: 14px;
+    }
+    .petugas b { color: #1b5e20; }
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    label { display:block; font-size:13px; font-weight:bold; margin-bottom:5px; }
+    select, input {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #ccc;
+      border-radius: 9px;
+      font-size: 15px;
+      background: white;
+    }
+    button, .linkbtn {
+      border: none;
+      border-radius: 10px;
+      padding: 13px 16px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      background: #1b5e20;
+      color: white;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+    button.secondary, .linkbtn.secondary { background:#eee; color:#333; }
+    button:disabled { opacity:.6; cursor:not-allowed; }
+    .actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+    .summary {
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:8px;
+      margin-bottom:14px;
+    }
+    .stat { background:white; border-radius:12px; padding:12px; text-align:center; }
+    .stat strong { display:block; font-size:22px; color:#1b5e20; }
+    .status { text-align:center; min-height:24px; margin:10px 0; }
+    .error { color:#b71c1c; }
+    .table-wrap { overflow:auto; max-height:560px; border:1px solid #ddd; border-radius:10px; }
+    table { width:100%; border-collapse:collapse; min-width:1100px; font-size:13px; }
+    th, td { padding:8px; border-bottom:1px solid #e5e5e5; text-align:left; }
+    th { position:sticky; top:0; background:#1b5e20; color:white; z-index:1; }
+    tr:nth-child(even) td { background:#fafafa; }
+    .muted { color:#777; font-size:13px; }
+    @media (max-width:760px) {
+      .filters { grid-template-columns: 1fr 1fr; }
+      .summary { grid-template-columns: 1fr 1fr; }
+      .actions > * { flex:1 1 45%; }
+    }
+    @media (max-width:460px) {
+      .filters { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>SMP ISLAM CIPAKU</h1>
+    <h2>REKAP PRESENSI</h2>
+  </div>
+
+  <div class="petugas">
+    <div>Petugas: <b id="namaGuru">-</b></div>
+    <a class="linkbtn secondary" href="./">← Kembali</a>
+  </div>
+
+  <div class="card" id="panelLogin" style="display:none; text-align:center;">
+    Sesi login tidak ditemukan. Silakan login dari halaman utama terlebih dahulu.<br><br>
+    <a class="linkbtn" href="./">Buka Halaman Utama</a>
+  </div>
+
+  <div id="isiRekap" style="display:none;">
+    <div class="card">
+      <div class="filters">
+        <div>
+          <label>Periode cepat</label>
+          <select id="preset">
+            <option value="hari">Hari ini</option>
+            <option value="minggu">Minggu ini</option>
+            <option value="bulan" selected>Bulan ini</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        <div>
+          <label>Dari tanggal</label>
+          <input type="date" id="tanggalMulai">
+        </div>
+        <div>
+          <label>Sampai tanggal</label>
+          <input type="date" id="tanggalAkhir">
+        </div>
+        <div>
+          <label>Kegiatan</label>
+          <select id="kegiatan"><option value="">Semua Kegiatan</option></select>
+        </div>
+        <div>
+          <label>Kelas</label>
+          <select id="kelas"><option value="">Semua Kelas</option></select>
+        </div>
+        <div>
+          <label>Jenis Kelamin</label>
+          <select id="jk">
+            <option value="">Semua</option>
+            <option value="L">Laki-laki</option>
+            <option value="P">Perempuan</option>
+          </select>
+        </div>
+        <div>
+          <label>Status</label>
+          <select id="statusFilter">
+            <option value="">Semua Status</option>
+            <option value="HADIR">Hadir</option>
+            <option value="TERLAMBAT">Terlambat</option>
+            <option value="SAKIT">Sakit</option>
+            <option value="IZIN">Izin</option>
+            <option value="ALPA">Alpa</option>
+            <option value="HAID">Haid</option>
+            <option value="BELUM ABSEN">Belum Absen</option>
+            <option value="TIDAK HADIR">Tidak Hadir</option>
+          </select>
+        </div>
+        <div style="grid-column: span 2;">
+          <label>Siswa tertentu</label>
+          <input id="siswa" placeholder="Kosongkan untuk semua; bisa nama / NIS / ID">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="tampilkan">📊 TAMPILKAN REKAP</button>
+        <button id="excel" class="secondary" disabled>📗 DOWNLOAD EXCEL</button>
+        <button id="pdf" class="secondary" disabled>📄 DOWNLOAD PDF</button>
+      </div>
+      <div class="status" id="pesan"></div>
+      <div class="muted">Maksimal satu kali proses 200 hari. Untuk periode lebih panjang, bagi menjadi beberapa periode.</div>
+    </div>
+
+    <div class="summary">
+      <div class="stat"><strong id="sumBaris">0</strong><small>Baris Rekap</small></div>
+      <div class="stat"><strong id="sumHadir">0</strong><small>Hadir</small></div>
+      <div class="stat"><strong id="sumTelat">0</strong><small>Terlambat</small></div>
+      <div class="stat"><strong id="sumTidak">0</strong><small>Tidak Hadir</small></div>
+      <div class="stat"><strong id="sumSakit">0</strong><small>Sakit</small></div>
+      <div class="stat"><strong id="sumIzin">0</strong><small>Izin</small></div>
+      <div class="stat"><strong id="sumAlpa">0</strong><small>Alpa</small></div>
+      <div class="stat"><strong id="sumHaid">0</strong><small>Haid</small></div>
+    </div>
+
+    <div class="card">
+      <div class="muted" id="infoTabel">Belum ada data.</div>
+      <div class="table-wrap" id="tableWrap" style="display:none; margin-top:10px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Tanggal</th><th>Hari</th><th>Kegiatan</th><th>ID</th><th>NIS</th>
+              <th>Nama</th><th>Kelas</th><th>JK</th><th>Status</th><th>Jam</th>
+              <th>Metode</th><th>Petugas</th><th>Alasan</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = "https://script.google.com/macros/s/AKfycbzMINLAmz6Wd5d5QvdDefkLNtmkECDPOFZg2D1YUhjS5uQKDys2gbqjG-0AAIIvyi6h-g/exec";
+const token = localStorage.getItem("absensi_token") || "";
+const guru = localStorage.getItem("absensi_guru") || "";
+let hasilTerakhir = null;
+
+const $ = id => document.getElementById(id);
+
+function isoLocal(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+
+function aturPreset() {
+  const now = new Date();
+  const p = $("preset").value;
+  let start = new Date(now);
+  let end = new Date(now);
+
+  if (p === "minggu") {
+    const day = now.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    start.setDate(now.getDate() + diff);
+  } else if (p === "bulan") {
+    start = new Date(now.getFullYear(), now.getMonth(), 1);
+  } else if (p === "custom") {
+    return;
+  }
+
+  $("tanggalMulai").value = isoLocal(start);
+  $("tanggalAkhir").value = isoLocal(end);
+}
+
+async function post(data) {
+  try {
+    const r = await fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=UTF-8" },
+      body: JSON.stringify(data)
+    });
+    return await r.json();
+  } catch (e) {
+    return { berhasil:false, pesan:"Tidak dapat terhubung ke server." };
+  }
+}
+
+function loginHabis(d) {
+  if (d && d.harusLogin) {
+    localStorage.removeItem("absensi_token");
+    localStorage.removeItem("absensi_guru");
+    alert("Sesi login habis. Silakan login kembali.");
+    location.href = "./";
+    return true;
+  }
+  return false;
+}
+
+async function muatMeta() {
+  const d = await post({ action:"metaRekap", token });
+  if (loginHabis(d)) return;
+  if (!d.berhasil) {
+    $("pesan").textContent = d.pesan || "Gagal memuat filter.";
+    return;
+  }
+
+  d.kegiatan.forEach(k => {
+    const op = document.createElement("option");
+    op.value = k; op.textContent = k;
+    $("kegiatan").appendChild(op);
+  });
+
+  d.kelas.forEach(k => {
+    const op = document.createElement("option");
+    op.value = k; op.textContent = k;
+    $("kelas").appendChild(op);
+  });
+}
+
+function render(d) {
+  hasilTerakhir = d;
+  const r = d.ringkasan;
+  $("sumBaris").textContent = r.totalBaris;
+  $("sumHadir").textContent = r.hadir;
+  $("sumTelat").textContent = r.terlambat;
+  $("sumTidak").textContent = r.tidakHadir;
+  $("sumSakit").textContent = r.sakit;
+  $("sumIzin").textContent = r.izin;
+  $("sumAlpa").textContent = r.alpa;
+  $("sumHaid").textContent = r.haid;
+
+  $("tbody").innerHTML = "";
+  const preview = d.data.slice(0, 500);
+
+  preview.forEach(x => {
+    const tr = document.createElement("tr");
+    [x.tanggal,x.hari,x.kegiatan,x.id,x.nis,x.nama,x.kelas,x.jk,x.status,x.jam,x.metode,x.petugas,x.alasan]
+      .forEach(v => {
+        const td = document.createElement("td");
+        td.textContent = v == null ? "" : String(v);
+        tr.appendChild(td);
+      });
+    $("tbody").appendChild(tr);
+  });
+
+  $("tableWrap").style.display = d.data.length ? "block" : "none";
+  $("infoTabel").textContent = d.data.length
+    ? `Menampilkan ${Math.min(500,d.data.length)} dari ${d.data.length} baris. File Excel/PDF memakai seluruh hasil.`
+    : "Tidak ada data pada filter ini.";
+
+  $("excel").disabled = !d.data.length;
+  $("pdf").disabled = !d.data.length;
+}
+
+$("tampilkan").onclick = async function() {
+  const mulai = $("tanggalMulai").value;
+  const akhir = $("tanggalAkhir").value;
+  if (!mulai || !akhir) {
+    $("pesan").textContent = "Tanggal mulai dan akhir harus diisi.";
+    return;
+  }
+
+  this.disabled = true;
+  $("pesan").textContent = "Memproses rekap...";
+
+  const d = await post({
+    action:"getRekap",
+    token,
+    tanggalMulai: mulai,
+    tanggalAkhir: akhir,
+    kegiatan: $("kegiatan").value,
+    kelas: $("kelas").value,
+    jk: $("jk").value,
+    status: $("statusFilter").value,
+    siswa: $("siswa").value.trim()
+  });
+
+  this.disabled = false;
+  if (loginHabis(d)) return;
+
+  if (!d.berhasil) {
+    $("pesan").className = "status error";
+    $("pesan").textContent = d.pesan || "Rekap gagal.";
+    return;
+  }
+
+  $("pesan").className = "status";
+  $("pesan").textContent = `Rekap ${d.periode.mulai} s.d. ${d.periode.akhir} berhasil dimuat.`;
+  render(d);
+};
+
+$("excel").onclick = function() {
+  if (!hasilTerakhir || !hasilTerakhir.data.length) return;
+
+  const rows = hasilTerakhir.data.map((x,i) => ({
+    No: i+1,
+    Tanggal: x.tanggal,
+    Hari: x.hari,
+    Kegiatan: x.kegiatan,
+    ID_SISWA: x.id,
+    NIS: x.nis,
+    Nama: x.nama,
+    Kelas: x.kelas,
+    JK: x.jk,
+    Status: x.status,
+    Jam: x.jam,
+    Metode: x.metode,
+    Petugas: x.petugas,
+    Alasan: x.alasan
+  }));
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws["!cols"] = [
+    {wch:6},{wch:12},{wch:10},{wch:20},{wch:12},{wch:15},{wch:28},
+    {wch:10},{wch:6},{wch:14},{wch:10},{wch:15},{wch:24},{wch:28}
+  ];
+  XLSX.utils.book_append_sheet(wb, ws, "Rekap Presensi");
+
+  const nama = `Rekap_Presensi_${$("tanggalMulai").value}_${$("tanggalAkhir").value}.xlsx`;
+  XLSX.writeFile(wb, nama);
+};
+
+$("pdf").onclick = function() {
+  if (!hasilTerakhir || !hasilTerakhir.data.length) return;
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:"landscape", unit:"mm", format:"a4" });
+
+  doc.setFontSize(14);
+  doc.text("SMP ISLAM CIPAKU", 148.5, 12, {align:"center"});
+  doc.setFontSize(11);
+  doc.text("REKAP PRESENSI KEGIATAN", 148.5, 18, {align:"center"});
+  doc.setFontSize(8);
+  doc.text(
+    `Periode: ${hasilTerakhir.periode.mulai} s.d. ${hasilTerakhir.periode.akhir} | ` +
+    `Kegiatan: ${hasilTerakhir.filter.kegiatan} | Kelas: ${hasilTerakhir.filter.kelas} | ` +
+    `JK: ${hasilTerakhir.filter.jk} | Status: ${hasilTerakhir.filter.status}`,
+    10, 24
+  );
+
+  const body = hasilTerakhir.data.map((x,i) => [
+    i+1, x.tanggal, x.kegiatan, x.nama, x.kelas, x.jk,
+    x.status, x.jam, x.metode, x.petugas, x.alasan
+  ]);
+
+  doc.autoTable({
+    startY: 28,
+    head: [["No","Tanggal","Kegiatan","Nama","Kelas","JK","Status","Jam","Metode","Petugas","Alasan"]],
+    body,
+    styles: { fontSize:6.5, cellPadding:1.5, overflow:"linebreak" },
+    headStyles: { fillColor:[27,94,32] },
+    columnStyles: {
+      0:{cellWidth:8},1:{cellWidth:18},2:{cellWidth:24},3:{cellWidth:42},
+      4:{cellWidth:14},5:{cellWidth:9},6:{cellWidth:20},7:{cellWidth:16},
+      8:{cellWidth:20},9:{cellWidth:32},10:{cellWidth:45}
+    },
+    didDrawPage: function(data) {
+      const pageCount = doc.getNumberOfPages();
+      doc.setFontSize(7);
+      doc.text(`Halaman ${pageCount}`, 285, 202, {align:"right"});
+    }
+  });
+
+  const nama = `Rekap_Presensi_${$("tanggalMulai").value}_${$("tanggalAkhir").value}.pdf`;
+  doc.save(nama);
+};
+
+$("preset").onchange = aturPreset;
+$("tanggalMulai").onchange = () => $("preset").value = "custom";
+$("tanggalAkhir").onchange = () => $("preset").value = "custom";
+
+if (!token || !guru) {
+  $("panelLogin").style.display = "block";
+} else {
+  $("namaGuru").textContent = guru;
+  $("isiRekap").style.display = "block";
+  aturPreset();
+  muatMeta();
+}
+</script>
+</body>
+</html>
