@@ -7,6 +7,10 @@
   <title>Absensi Kegiatan Pagi</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -23,17 +27,18 @@
     h1 {
       color: #1b5e20;
       margin-bottom: 5px;
+      font-size: 26px;
     }
 
     h2 {
       font-size: 18px;
       color: #555;
       margin-top: 0;
+      margin-bottom: 20px;
     }
 
     .camera-box {
       position: relative;
-      margin-top: 20px;
       overflow: hidden;
       border-radius: 15px;
       background: #000;
@@ -62,24 +67,48 @@
     #status {
       margin-top: 15px;
       font-size: 16px;
+      line-height: 1.5;
     }
 
     .hasil {
       margin-top: 20px;
-      padding: 20px;
+      padding: 22px;
       background: white;
-      border-radius: 12px;
+      border-radius: 15px;
       display: none;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
     }
 
     .hasil h3 {
-      margin-top: 0;
       color: #1b5e20;
+      margin-top: 0;
+      margin-bottom: 10px;
     }
 
-    #hasilQR {
-      font-size: 28px;
+    .kode-qr {
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 15px;
+    }
+
+    .nama {
+      font-size: 24px;
       font-weight: bold;
+      color: #222;
+      margin-bottom: 8px;
+    }
+
+    .kelas {
+      font-size: 18px;
+      color: #555;
+    }
+
+    .error {
+      color: #b71c1c;
+    }
+
+    .sukses {
+      color: #1b5e20;
     }
   </style>
 </head>
@@ -104,8 +133,17 @@
     </p>
 
     <div class="hasil" id="kotakHasil">
-      <h3>QR BERHASIL DIBACA</h3>
-      <div id="hasilQR">-</div>
+
+      <h3 id="judulHasil">
+        DATA SISWA
+      </h3>
+
+      <div class="kode-qr" id="kodeQR"></div>
+
+      <div class="nama" id="namaSiswa"></div>
+
+      <div class="kelas" id="kelasSiswa"></div>
+
     </div>
 
   </div>
@@ -117,37 +155,104 @@
     "https://cdn.jsdelivr.net/npm/qr-scanner@1.4.2/qr-scanner.min.js";
 
 
-    const video = document.getElementById("qr-video");
-    const tombolScan = document.getElementById("tombolScan");
-    const status = document.getElementById("status");
-    const kotakHasil = document.getElementById("kotakHasil");
-    const hasilQR = document.getElementById("hasilQR");
+    /*
+     * ALAMAT BACKEND APPS SCRIPT
+     */
+
+    const API_URL =
+      "https://script.google.com/macros/s/AKfycbzMINLAmz6Wd5d5QvdDefkLNtmkECDPOFZg2D1YUhjS5uQKDys2gbqjG-0AAIIvyi6h-g/exec";
+
+
+    const video =
+      document.getElementById("qr-video");
+
+    const tombolScan =
+      document.getElementById("tombolScan");
+
+    const status =
+      document.getElementById("status");
+
+    const kotakHasil =
+      document.getElementById("kotakHasil");
+
+    const judulHasil =
+      document.getElementById("judulHasil");
+
+    const kodeQR =
+      document.getElementById("kodeQR");
+
+    const namaSiswa =
+      document.getElementById("namaSiswa");
+
+    const kelasSiswa =
+      document.getElementById("kelasSiswa");
+
 
     let sedangScan = false;
 
+    let sedangMemproses = false;
+
+
+    /*
+     * SCANNER QR
+     */
 
     const scanner = new QrScanner(
 
       video,
 
-      hasil => {
+      async hasil => {
 
-        const kode = hasil.data;
+        /*
+         * Mencegah QR diproses berkali-kali
+         */
 
-        hasilQR.textContent = kode;
-        kotakHasil.style.display = "block";
+        if (sedangMemproses) {
+          return;
+        }
 
-        status.textContent = "✅ QR berhasil dibaca.";
+
+        sedangMemproses = true;
+
+
+        const kode =
+          String(hasil.data || "").trim();
+
+
+        /*
+         * Hentikan kamera sementara
+         */
 
         scanner.stop();
 
         sedangScan = false;
 
-        tombolScan.textContent = "📷 SCAN LAGI";
+
+        tombolScan.textContent =
+          "📷 SCAN LAGI";
+
+
+        status.textContent =
+          "⏳ Mencari data siswa...";
+
+
+        /*
+         * Getar sebentar jika HP mendukung
+         */
 
         if (navigator.vibrate) {
-          navigator.vibrate(150);
+          navigator.vibrate(120);
         }
+
+
+        /*
+         * Cari siswa ke Apps Script
+         */
+
+        await cariDataSiswa(kode);
+
+
+        sedangMemproses = false;
 
       },
 
@@ -162,49 +267,232 @@
     );
 
 
-    tombolScan.addEventListener("click", async function () {
+    /*
+     * FUNGSI MENCARI SISWA KE APPS SCRIPT
+     */
 
-      if (sedangScan) {
-
-        scanner.stop();
-
-        sedangScan = false;
-
-        tombolScan.textContent = "📷 MULAI SCAN QR";
-
-        status.textContent = "Scanner dihentikan.";
-
-        return;
-      }
-
+    async function cariDataSiswa(idSiswa) {
 
       try {
 
-        kotakHasil.style.display = "none";
+        const url =
+          API_URL +
+          "?action=cariSiswa&id=" +
+          encodeURIComponent(idSiswa);
 
-        status.textContent = "Membuka kamera...";
 
-        await scanner.start();
+        const response =
+          await fetch(url);
 
-        sedangScan = true;
 
-        tombolScan.textContent = "⏹ HENTIKAN SCANNER";
+        if (!response.ok) {
+
+          throw new Error(
+            "Server tidak memberikan respons."
+          );
+
+        }
+
+
+        const data =
+          await response.json();
+
+
+        /*
+         * SISWA DITEMUKAN
+         */
+
+        if (
+          data.berhasil &&
+          data.ditemukan &&
+          data.siswa
+        ) {
+
+          kotakHasil.style.display =
+            "block";
+
+
+          judulHasil.textContent =
+            "✅ SISWA DITEMUKAN";
+
+
+          judulHasil.className =
+            "sukses";
+
+
+          kodeQR.textContent =
+            "ID QR: " + data.siswa.id;
+
+
+          namaSiswa.textContent =
+            data.siswa.nama;
+
+
+          kelasSiswa.textContent =
+            "Kelas " + data.siswa.kelas;
+
+
+          status.textContent =
+            "✅ Data siswa berhasil ditemukan.";
+
+
+          if (navigator.vibrate) {
+
+            navigator.vibrate([
+              100,
+              80,
+              100
+            ]);
+
+          }
+
+
+          return;
+        }
+
+
+        /*
+         * SISWA TIDAK DITEMUKAN
+         */
+
+        kotakHasil.style.display =
+          "block";
+
+
+        judulHasil.textContent =
+          "❌ SISWA TIDAK DITEMUKAN";
+
+
+        judulHasil.className =
+          "error";
+
+
+        kodeQR.textContent =
+          "QR terbaca: " + idSiswa;
+
+
+        namaSiswa.textContent =
+          "";
+
+
+        kelasSiswa.textContent =
+          "";
+
 
         status.textContent =
-          "Arahkan kamera ke QR siswa.";
+          data.pesan ||
+          "ID QR tidak ditemukan di database.";
 
-      }
 
-      catch (error) {
+      } catch (error) {
 
         console.error(error);
 
+
+        kotakHasil.style.display =
+          "block";
+
+
+        judulHasil.textContent =
+          "⚠️ GAGAL TERHUBUNG";
+
+
+        judulHasil.className =
+          "error";
+
+
+        kodeQR.textContent =
+          "QR terbaca: " + idSiswa;
+
+
+        namaSiswa.textContent =
+          "";
+
+
+        kelasSiswa.textContent =
+          "";
+
+
         status.textContent =
-          "❌ Kamera tidak dapat dibuka. Pastikan izin kamera diberikan.";
+          "❌ Tidak dapat terhubung ke server.";
 
       }
 
-    });
+    }
+
+
+    /*
+     * TOMBOL MULAI / HENTIKAN SCANNER
+     */
+
+    tombolScan.addEventListener(
+      "click",
+
+      async function () {
+
+        /*
+         * Kalau scanner sedang aktif,
+         * tombol digunakan untuk menghentikan
+         */
+
+        if (sedangScan) {
+
+          scanner.stop();
+
+          sedangScan = false;
+
+
+          tombolScan.textContent =
+            "📷 MULAI SCAN QR";
+
+
+          status.textContent =
+            "Scanner dihentikan.";
+
+
+          return;
+        }
+
+
+        try {
+
+          kotakHasil.style.display =
+            "none";
+
+
+          status.textContent =
+            "Membuka kamera...";
+
+
+          await scanner.start();
+
+
+          sedangScan = true;
+
+          sedangMemproses = false;
+
+
+          tombolScan.textContent =
+            "⏹ HENTIKAN SCANNER";
+
+
+          status.textContent =
+            "Arahkan kamera ke QR siswa.";
+
+
+        } catch (error) {
+
+          console.error(error);
+
+
+          status.textContent =
+            "❌ Kamera tidak dapat dibuka. Pastikan izin kamera diberikan.";
+
+        }
+
+      }
+
+    );
 
   </script>
 
