@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Data Siswa - SMP Islam Cipaku</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f7f5;color:#222;padding:15px}
+.container{max-width:820px;margin:auto}
+.header{text-align:center;margin-bottom:15px}
+h1{margin:0 0 4px;color:#1b5e20;font-size:25px}
+h2{margin:0;color:#555;font-size:17px}
+.card{background:white;border-radius:15px;padding:17px;margin-bottom:14px;box-shadow:0 3px 10px rgba(0,0,0,.07)}
+.petugas{display:flex;align-items:center;justify-content:space-between;padding:12px;background:#e8f5e9;border-radius:12px;margin-bottom:14px;gap:10px}
+.petugas b{color:#1b5e20}
+button,.linkbtn{border:none;border-radius:10px;padding:13px 15px;font-size:15px;font-weight:bold;cursor:pointer;background:#1b5e20;color:white;text-decoration:none;text-align:center;display:inline-block}
+button{width:100%}
+button.secondary,.linkbtn.secondary{background:#eee;color:#333}
+button.danger{background:#b71c1c}
+button.warning{background:#e65100}
+button.small{padding:8px 10px;font-size:12px;width:auto;margin:3px}
+button:disabled{opacity:.6;cursor:not-allowed}
+input,select{width:100%;padding:12px;border:1px solid #ccc;border-radius:9px;font-size:16px;background:white}
+label{display:block;font-weight:bold;margin:12px 0 6px}
+.center{text-align:center}
+.error{color:#b71c1c}.success{color:#1b5e20}.muted{color:#777;font-size:13px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.stat{background:white;border-radius:12px;padding:13px;text-align:center}
+.stat strong{display:block;color:#1b5e20;font-size:23px}
+.menu{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.menu button{margin:0}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px}
+.siswa{border:1px solid #ddd;border-radius:12px;padding:12px;margin-bottom:8px;background:white}
+.siswa-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.siswa-name{font-weight:bold;font-size:16px}.siswa small{color:#666;line-height:1.5}
+.badge{padding:5px 8px;border-radius:12px;font-size:11px;font-weight:bold;white-space:nowrap}
+.aktif{background:#e8f5e9;color:#1b5e20}.nonaktif{background:#ffebee;color:#b71c1c}
+.actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+#appAdmin,#panelTambah,#panelData,#panelEdit,#hasilTambah{display:none}
+.qr-card{border:2px solid #1b5e20;border-radius:14px;padding:16px;text-align:center;background:#fff}
+.qr-card img{width:220px;height:220px;max-width:100%}
+.qr-name{font-size:20px;font-weight:bold;margin:8px 0}.qr-id{font-size:18px;color:#1b5e20;font-weight:bold}
+@media(max-width:650px){.filters{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}.menu{grid-template-columns:1fr}.siswa-head{flex-direction:column}.actions button{flex:1 1 45%;width:auto}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>SMP ISLAM CIPAKU</h1>
+    <h2>ADMIN DATA SISWA</h2>
+  </div>
+
+  <div class="petugas">
+    <div>Petugas: <b id="namaGuru">-</b></div>
+    <a class="linkbtn secondary" href="./">← Kembali</a>
+  </div>
+
+  <div id="panelNoLogin" class="card center" style="display:none">
+    Sesi login guru tidak ditemukan.<br><br>
+    <a class="linkbtn" href="./">Buka Halaman Utama</a>
+  </div>
+
+  <div id="panelSetup" class="card" style="display:none">
+    <h3 style="margin-top:0;color:#b71c1c">PIN Admin belum diatur</h3>
+    <p>Backend sudah membuat sheet <b>PENGATURAN</b> secara otomatis.</p>
+    <p>Buka Spreadsheet → sheet <b>PENGATURAN</b> → pada baris <b>ADMIN_PIN</b>, isi kolom <b>NILAI</b> dengan PIN admin pilihanmu (disarankan 4–6 angka).</p>
+    <p class="muted">PIN ini berbeda dari PIN login guru. Tujuannya supaya tidak semua guru bisa mengubah data siswa.</p>
+    <button onclick="location.reload()">🔄 SUDAH DIISI, CEK LAGI</button>
+  </div>
+
+  <div id="panelAdminLogin" class="card" style="display:none">
+    <h3 class="center" style="color:#1b5e20">🔐 AKSES ADMIN</h3>
+    <label>PIN Admin</label>
+    <input id="adminPin" type="password" inputmode="numeric" maxlength="8" placeholder="Masukkan PIN Admin">
+    <button id="bukaAdmin">BUKA ADMIN</button>
+    <div id="pesanPin" class="center error" style="margin-top:10px"></div>
+  </div>
+
+  <div id="appAdmin">
+    <div class="grid3">
+      <div class="stat"><strong id="totalSiswa">0</strong><small>Total Siswa</small></div>
+      <div class="stat"><strong id="aktifSiswa">0</strong><small>Aktif</small></div>
+      <div class="stat"><strong id="nonaktifSiswa">0</strong><small>Nonaktif</small></div>
+    </div>
+
+    <div class="menu">
+      <button id="menuTambah">➕ TAMBAH SISWA</button>
+      <button id="menuData" class="secondary">👥 DATA SISWA</button>
+    </div>
+
+    <!-- TAMBAH -->
+    <div id="panelTambah" class="card">
+      <h3 style="margin-top:0">➕ Tambah Siswa Baru</h3>
+
+      <label>ID Siswa</label>
+      <input id="idBaru" readonly>
+      <div class="muted">Dibuat otomatis dan tidak boleh dipakai ulang.</div>
+
+      <label>NIS</label>
+      <input id="nisBaru" inputmode="numeric" placeholder="NIS siswa">
+
+      <label>Nama Lengkap</label>
+      <input id="namaBaru" placeholder="Nama lengkap siswa">
+
+      <label>Kelas</label>
+      <input id="kelasBaru" list="daftarKelas" placeholder="Contoh: 8-A">
+      <datalist id="daftarKelas"></datalist>
+
+      <label>Jenis Kelamin</label>
+      <select id="jkBaru">
+        <option value="">-- Pilih --</option>
+        <option value="L">Laki-laki</option>
+        <option value="P">Perempuan</option>
+      </select>
+
+      <label>Tanggal Masuk</label>
+      <input id="tanggalMasukBaru" type="date">
+      <div class="muted">Penting agar siswa baru tidak dianggap tidak hadir pada periode sebelum ia masuk.</div>
+
+      <button id="simpanBaru">💾 SIMPAN & BUAT QR</button>
+      <div id="pesanTambah" class="center" style="margin-top:10px"></div>
+    </div>
+
+    <div id="hasilTambah" class="card">
+      <div class="qr-card">
+        <div class="success"><b>✅ SISWA BERHASIL DITAMBAHKAN</b></div>
+        <img id="qrBaru" alt="QR siswa">
+        <div class="qr-name" id="qrNama"></div>
+        <div id="qrKelas"></div>
+        <div class="qr-id" id="qrId"></div>
+        <button id="cetakQrBaru">🖨️ CETAK QR</button>
+        <button id="tambahLagi" class="secondary">➕ TAMBAH SISWA LAGI</button>
+      </div>
+    </div>
+
+    <!-- DATA -->
+    <div id="panelData">
+      <div class="card">
+        <h3 style="margin-top:0">👥 Data Siswa</h3>
+        <div class="filters">
+          <input id="cariData" placeholder="Cari nama / NIS / ID / kelas">
+          <select id="filterKelas"><option value="">Semua Kelas</option></select>
+          <select id="filterAktif">
+            <option value="">Semua Status</option>
+            <option value="AKTIF">Aktif</option>
+            <option value="NONAKTIF">Nonaktif</option>
+          </select>
+        </div>
+        <button id="refreshData">🔄 TAMPILKAN DATA</button>
+        <div id="infoData" class="muted center" style="margin-top:8px"></div>
+      </div>
+
+      <div id="panelEdit" class="card" style="border:2px solid #1b5e20">
+        <h3 style="margin-top:0">✏️ Edit Siswa</h3>
+        <input id="editId" type="hidden">
+        <div><b id="editIdTampil"></b></div>
+
+        <label>NIS</label>
+        <input id="editNis">
+
+        <label>Nama</label>
+        <input id="editNama">
+
+        <label>Kelas</label>
+        <input id="editKelas" list="daftarKelas">
+
+        <label>Jenis Kelamin</label>
+        <select id="editJk">
+          <option value="L">Laki-laki</option>
+          <option value="P">Perempuan</option>
+        </select>
+
+        <label>Tanggal Masuk</label>
+        <input id="editTanggalMasuk" type="date">
+
+        <label>Tanggal Efektif Perubahan Kelas</label>
+        <input id="editTanggalEfektif" type="date">
+        <div class="muted">Dipakai hanya jika kelas berubah, agar rekap lama tetap memakai kelas sebelumnya.</div>
+
+        <button id="simpanEdit">✅ SIMPAN PERUBAHAN</button>
+        <button id="batalEdit" class="secondary">BATAL</button>
+      </div>
+
+      <div id="daftarSiswa"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = "https://script.google.com/macros/s/AKfycbzMINLAmz6Wd5d5QvdDefkLNtmkECDPOFZg2D1YUhjS5uQKDys2gbqjG-0AAIIvyi6h-g/exec";
+const token = localStorage.getItem("absensi_token") || "";
+const guru = localStorage.getItem("absensi_guru") || "";
+let adminPin = sessionStorage.getItem("absensi_admin_pin") || "";
+let meta = null;
+let dataSiswa = [];
+let siswaQrTerakhir = null;
+const $ = id => document.getElementById(id);
+
+function hariIniISO(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+
+async function post(data){
+  try{
+    const r = await fetch(API,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=UTF-8"},
+      body:JSON.stringify(data)
+    });
+    return await r.json();
+  }catch(e){
+    return {berhasil:false,pesan:"Tidak dapat terhubung ke server."};
+  }
+}
+
+function cekLogin(d){
+  if(d && d.harusLogin){
+    localStorage.removeItem("absensi_token");
+    localStorage.removeItem("absensi_guru");
+    alert("Sesi login habis. Silakan login kembali.");
+    location.href="./";
+    return true;
+  }
+  return false;
+}
+
+async function mulai(){
+  if(!token || !guru){
+    $("panelNoLogin").style.display="block";
+    return;
+  }
+
+  $("namaGuru").textContent=guru;
+  const info = await post({action:"adminInfo",token});
+  if(cekLogin(info)) return;
+
+  if(!info.berhasil){
+    $("panelAdminLogin").style.display="block";
+    $("pesanPin").textContent=info.pesan||"Gagal membuka admin.";
+    return;
+  }
+
+  if(!info.adminConfigured){
+    $("panelSetup").style.display="block";
+    return;
+  }
+
+  $("panelAdminLogin").style.display="block";
+  if(adminPin){
+    $("adminPin").value=adminPin;
+    await unlockAdmin();
+  }
+}
+
+async function unlockAdmin(){
+  const pin=$("adminPin").value.trim();
+  if(!pin){$("pesanPin").textContent="Masukkan PIN Admin.";return;}
+
+  $("bukaAdmin").disabled=true;
+  $("pesanPin").textContent="Memeriksa...";
+  const d=await post({action:"adminMeta",token,adminPin:pin});
+  $("bukaAdmin").disabled=false;
+
+  if(cekLogin(d)) return;
+  if(!d.berhasil){
+    $("pesanPin").textContent=d.pesan||"PIN Admin salah.";
+    return;
+  }
+
+  adminPin=pin;
+  sessionStorage.setItem("absensi_admin_pin",adminPin);
+  meta=d;
+  $("panelAdminLogin").style.display="none";
+  $("appAdmin").style.display="block";
+  isiMeta();
+  bukaTambah();
+}
+
+$("bukaAdmin").onclick=unlockAdmin;
+$("adminPin").addEventListener("keydown",e=>{if(e.key==="Enter") unlockAdmin();});
+
+function isiMeta(){
+  $("totalSiswa").textContent=meta.total;
+  $("aktifSiswa").textContent=meta.aktif;
+  $("nonaktifSiswa").textContent=meta.nonaktif;
+  $("idBaru").value=meta.nextId;
+  $("tanggalMasukBaru").value=hariIniISO();
+  $("editTanggalEfektif").value=hariIniISO();
+
+  const dl=$("daftarKelas");
+  dl.innerHTML="";
+  meta.kelas.forEach(k=>{
+    const op=document.createElement("option");op.value=k;dl.appendChild(op);
+  });
+
+  const fk=$("filterKelas");
+  const lama=fk.value;
+  fk.innerHTML='<option value="">Semua Kelas</option>';
+  meta.kelas.forEach(k=>{
+    const op=document.createElement("option");op.value=k;op.textContent=k;fk.appendChild(op);
+  });
+  fk.value=lama;
+}
+
+async function refreshMeta(){
+  const d=await post({action:"adminMeta",token,adminPin});
+  if(d.berhasil){meta=d;isiMeta();}
+}
+
+function bukaTambah(){
+  $("panelTambah").style.display="block";
+  $("panelData").style.display="none";
+  $("hasilTambah").style.display="none";
+}
+
+function bukaData(){
+  $("panelTambah").style.display="none";
+  $("hasilTambah").style.display="none";
+  $("panelData").style.display="block";
+  loadData();
+}
+
+$("menuTambah").onclick=bukaTambah;
+$("menuData").onclick=bukaData;
+
+$("simpanBaru").onclick=async function(){
+  const input={
+    action:"adminTambahSiswa",token,adminPin,
+    nis:$("nisBaru").value.trim(),
+    nama:$("namaBaru").value.trim(),
+    kelas:$("kelasBaru").value.trim(),
+    jk:$("jkBaru").value,
+    tanggalMasuk:$("tanggalMasukBaru").value
+  };
+
+  this.disabled=true;this.textContent="MENYIMPAN...";
+  $("pesanTambah").className="center";$("pesanTambah").textContent="";
+  const d=await post(input);
+  this.disabled=false;this.textContent="💾 SIMPAN & BUAT QR";
+
+  if(cekLogin(d))return;
+  if(!d.berhasil){
+    $("pesanTambah").className="center error";
+    $("pesanTambah").textContent=d.pesan||"Gagal menambah siswa.";
+    return;
+  }
+
+  siswaQrTerakhir=d.siswa;
+  tampilQr(d.siswa);
+  $("panelTambah").style.display="none";
+  $("hasilTambah").style.display="block";
+  await refreshMeta();
+};
+
+function tampilQr(s){
+  $("qrBaru").src=`https://quickchart.io/qr?text=${encodeURIComponent(s.id)}&size=300&margin=2&ecLevel=M`;
+  $("qrNama").textContent=s.nama;
+  $("qrKelas").textContent=`Kelas ${s.kelas}`;
+  $("qrId").textContent=s.id;
+}
+
+$("cetakQrBaru").onclick=()=>{if(siswaQrTerakhir)cetakQr(siswaQrTerakhir);};
+$("tambahLagi").onclick=function(){
+  $("nisBaru").value="";$("namaBaru").value="";$("kelasBaru").value="";$("jkBaru").value="";
+  $("tanggalMasukBaru").value=hariIniISO();siswaQrTerakhir=null;bukaTambah();
+};
+
+function cetakQr(s){
+  const url=`https://quickchart.io/qr?text=${encodeURIComponent(s.id)}&size=350&margin=2&ecLevel=M`;
+  const w=window.open("","_blank","width=520,height=700");
+  if(!w){alert("Pop-up diblokir. Izinkan pop-up untuk mencetak QR.");return;}
+  w.document.write(`<!doctype html><html><head><title>QR ${s.id}</title><style>
+    body{font-family:Arial;text-align:center;padding:30px}.card{border:2px solid #222;border-radius:15px;padding:22px;max-width:360px;margin:auto}
+    img{width:280px;height:280px}.school{font-size:16px;font-weight:bold}.name{font-size:22px;font-weight:bold;margin-top:8px}.id{font-size:20px;font-weight:bold;margin-top:5px}
+    @media print{body{padding:0}.card{margin-top:20px}}
+  </style></head><body><div class="card"><div class="school">SMP ISLAM CIPAKU</div><img src="${url}" onload="setTimeout(()=>window.print(),500)"><div class="name">${escapeHtml(s.nama)}</div><div>Kelas ${escapeHtml(s.kelas)}</div><div class="id">${escapeHtml(s.id)}</div></div></body></html>`);
+  w.document.close();
+}
+
+async function loadData(){
+  $("infoData").textContent="Memuat data...";
+  const d=await post({
+    action:"adminListSiswa",token,adminPin,
+    query:$("cariData").value.trim(),
+    kelas:$("filterKelas").value,
+    status:$("filterAktif").value
+  });
+  if(cekLogin(d))return;
+  if(!d.berhasil){$("infoData").textContent=d.pesan||"Gagal memuat data.";return;}
+  dataSiswa=d.data;
+  $("infoData").textContent=`${d.total} siswa ditemukan.`;
+  renderData();
+}
+
+function renderData(){
+  const tempat=$("daftarSiswa");tempat.innerHTML="";
+  if(!dataSiswa.length){tempat.innerHTML='<div class="card center">Tidak ada data siswa.</div>';return;}
+
+  dataSiswa.forEach(s=>{
+    const div=document.createElement("div");div.className="siswa";
+    const badge=s.status==="AKTIF"?"aktif":"nonaktif";
+    div.innerHTML=`<div class="siswa-head"><div><div class="siswa-name">${escapeHtml(s.nama)}</div><small>${escapeHtml(s.kelas)} • ${escapeHtml(s.id)} • NIS ${escapeHtml(s.nis)}<br>${s.jk==="P"?"Perempuan":"Laki-laki"} • Masuk: ${s.tanggalMasuk||"data lama"}${s.tanggalNonaktif?" • Nonaktif: "+s.tanggalNonaktif:""}</small></div><span class="badge ${badge}">${escapeHtml(s.status)}</span></div><div class="actions"></div>`;
+
+    const ac=div.querySelector(".actions");
+    const edit=buatTombol("✏️ Edit","secondary",()=>bukaEdit(s));
+    const qr=buatTombol("🖨️ QR","secondary",()=>cetakQr(s));
+    ac.appendChild(edit);ac.appendChild(qr);
+
+    if(s.status==="AKTIF") ac.appendChild(buatTombol("🚫 Nonaktifkan","danger",()=>ubahAktif(s,"NONAKTIF")));
+    else ac.appendChild(buatTombol("✅ Aktifkan","",()=>ubahAktif(s,"AKTIF")));
+
+    tempat.appendChild(div);
+  });
+}
+
+function buatTombol(teks,kelas,fn){
+  const b=document.createElement("button");b.className=`small ${kelas||""}`;b.textContent=teks;b.onclick=fn;return b;
+}
+
+$("refreshData").onclick=loadData;
+$("filterKelas").onchange=loadData;
+$("filterAktif").onchange=loadData;
+$("cariData").addEventListener("keydown",e=>{if(e.key==="Enter")loadData();});
+
+function bukaEdit(s){
+  $("editId").value=s.id;$("editIdTampil").textContent=s.id;
+  $("editNis").value=s.nis;$("editNama").value=s.nama;$("editKelas").value=s.kelas;$("editJk").value=s.jk;
+  $("editTanggalMasuk").value=s.tanggalMasuk||"";$("editTanggalEfektif").value=hariIniISO();
+  $("panelEdit").style.display="block";
+  $("panelEdit").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+$("batalEdit").onclick=()=>{$("panelEdit").style.display="none";};
+
+$("simpanEdit").onclick=async function(){
+  this.disabled=true;this.textContent="MENYIMPAN...";
+  const d=await post({
+    action:"adminUpdateSiswa",token,adminPin,
+    id:$("editId").value,
+    nis:$("editNis").value.trim(),
+    nama:$("editNama").value.trim(),
+    kelas:$("editKelas").value.trim(),
+    jk:$("editJk").value,
+    tanggalMasuk:$("editTanggalMasuk").value,
+    tanggalEfektifKelas:$("editTanggalEfektif").value
+  });
+  this.disabled=false;this.textContent="✅ SIMPAN PERUBAHAN";
+  if(cekLogin(d))return;
+  if(!d.berhasil){alert(d.pesan||"Gagal menyimpan.");return;}
+  alert("Data siswa berhasil diperbarui.");
+  $("panelEdit").style.display="none";
+  await refreshMeta();await loadData();
+};
+
+async function ubahAktif(s,aksi){
+  let catatan="";
+  if(aksi==="NONAKTIF"){
+    if(!confirm(`Nonaktifkan ${s.nama}?\n\nRiwayat presensi tidak akan dihapus.`))return;
+    catatan=prompt("Alasan nonaktif (misalnya pindah sekolah / lulus):","")||"";
+  }else{
+    if(!confirm(`Aktifkan kembali ${s.nama}?`))return;
+  }
+
+  const d=await post({action:"adminUbahAktif",token,adminPin,id:s.id,aksi,catatan,tanggal:hariIniISO()});
+  if(cekLogin(d))return;
+  if(!d.berhasil){alert(d.pesan||"Gagal mengubah status.");return;}
+  alert(d.pesan);
+  await refreshMeta();await loadData();
+}
+
+function escapeHtml(v){
+  return String(v??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
+}
+
+mulai();
+</script>
+</body>
+</html>
