@@ -31,11 +31,19 @@
       margin-top: 0;
     }
 
+    .camera-box {
+      position: relative;
+      margin-top: 20px;
+      overflow: hidden;
+      border-radius: 15px;
+      background: #000;
+    }
+
     video {
       width: 100%;
-      margin-top: 20px;
-      border-radius: 15px;
-      background: black;
+      display: block;
+      min-height: 300px;
+      object-fit: cover;
     }
 
     button {
@@ -55,6 +63,24 @@
       margin-top: 15px;
       font-size: 16px;
     }
+
+    .hasil {
+      margin-top: 20px;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      display: none;
+    }
+
+    .hasil h3 {
+      margin-top: 0;
+      color: #1b5e20;
+    }
+
+    #hasilQR {
+      font-size: 28px;
+      font-weight: bold;
+    }
   </style>
 </head>
 
@@ -65,52 +91,120 @@
     <h1>SMP ISLAM CIPAKU</h1>
     <h2>ABSENSI KEGIATAN PAGI</h2>
 
-    <video id="camera" autoplay playsinline muted></video>
+    <div class="camera-box">
+      <video id="qr-video"></video>
+    </div>
 
-    <button onclick="mulaiKamera()">
-      📷 BUKA KAMERA
+    <button id="tombolScan">
+      📷 MULAI SCAN QR
     </button>
 
     <p id="status">
       Kamera belum dinyalakan.
     </p>
 
+    <div class="hasil" id="kotakHasil">
+      <h3>QR BERHASIL DIBACA</h3>
+      <div id="hasilQR">-</div>
+    </div>
+
   </div>
 
-  <script>
 
-    async function mulaiKamera() {
+  <script type="module">
 
-      const video = document.getElementById("camera");
-      const status = document.getElementById("status");
+    import QrScanner from
+    "https://cdn.jsdelivr.net/npm/qr-scanner@1.4.2/qr-scanner.min.js";
 
-      status.innerText = "Membuka kamera...";
+
+    const video = document.getElementById("qr-video");
+    const tombolScan = document.getElementById("tombolScan");
+    const status = document.getElementById("status");
+    const kotakHasil = document.getElementById("kotakHasil");
+    const hasilQR = document.getElementById("hasilQR");
+
+    let sedangScan = false;
+
+
+    const scanner = new QrScanner(
+
+      video,
+
+      hasil => {
+
+        const kode = hasil.data;
+
+        hasilQR.textContent = kode;
+        kotakHasil.style.display = "block";
+
+        status.textContent = "✅ QR berhasil dibaca.";
+
+        scanner.stop();
+
+        sedangScan = false;
+
+        tombolScan.textContent = "📷 SCAN LAGI";
+
+        if (navigator.vibrate) {
+          navigator.vibrate(150);
+        }
+
+      },
+
+      {
+        preferredCamera: "environment",
+        highlightScanRegion: true,
+        highlightCodeOutline: true,
+        returnDetailedScanResult: true,
+        maxScansPerSecond: 10
+      }
+
+    );
+
+
+    tombolScan.addEventListener("click", async function () {
+
+      if (sedangScan) {
+
+        scanner.stop();
+
+        sedangScan = false;
+
+        tombolScan.textContent = "📷 MULAI SCAN QR";
+
+        status.textContent = "Scanner dihentikan.";
+
+        return;
+      }
+
 
       try {
 
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: {
-              ideal: "environment"
-            }
-          },
-          audio: false
-        });
+        kotakHasil.style.display = "none";
 
-        video.srcObject = stream;
+        status.textContent = "Membuka kamera...";
 
-        status.innerText = "✅ Kamera berhasil dibuka.";
+        await scanner.start();
 
-      } catch (error) {
+        sedangScan = true;
+
+        tombolScan.textContent = "⏹ HENTIKAN SCANNER";
+
+        status.textContent =
+          "Arahkan kamera ke QR siswa.";
+
+      }
+
+      catch (error) {
 
         console.error(error);
 
-        status.innerText =
+        status.textContent =
           "❌ Kamera tidak dapat dibuka. Pastikan izin kamera diberikan.";
 
       }
 
-    }
+    });
 
   </script>
 
