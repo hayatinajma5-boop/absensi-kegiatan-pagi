@@ -25,13 +25,13 @@ body {
 }
 
 .container {
-  max-width: 520px;
+  max-width: 540px;
   margin: auto;
 }
 
 .header {
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 15px;
 }
 
 h1 {
@@ -55,48 +55,29 @@ h2 {
 .card {
   background: white;
   border-radius: 15px;
-  padding: 18px;
-  margin-bottom: 15px;
-  box-shadow: 0 3px 10px rgba(0,0,0,.07);
-}
-
-label {
-  display: block;
-  font-weight: bold;
-  margin: 13px 0 6px;
-}
-
-select,
-input {
-  width: 100%;
-  padding: 13px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 9px;
-  background: white;
+  padding: 17px;
+  margin-bottom: 14px;
+  box-shadow:
+    0 3px 10px
+    rgba(0,0,0,.07);
 }
 
 button {
   width: 100%;
   border: none;
   border-radius: 10px;
-  padding: 15px;
-  font-size: 17px;
+  padding: 14px;
+  font-size: 16px;
   font-weight: bold;
   cursor: pointer;
   background: #1b5e20;
   color: white;
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 button.secondary {
-  background: #eeeeee;
+  background: #eee;
   color: #333;
-}
-
-button.active-menu {
-  background: #1b5e20;
-  color: white;
 }
 
 button.stop {
@@ -106,20 +87,44 @@ button.stop {
 button.logout {
   width: auto;
   margin: 0;
-  padding: 8px 13px;
-  font-size: 13px;
+  padding: 8px 12px;
   background: #eee;
   color: #555;
+  font-size: 13px;
+}
+
+select,
+input,
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 9px;
+  font-size: 16px;
+  background: white;
+}
+
+textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin:
+    12px 0 6px;
 }
 
 .petugas {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content:
+    space-between;
+  padding: 12px;
   background: #e8f5e9;
-  padding: 12px 14px;
   border-radius: 12px;
-  margin-bottom: 15px;
+  margin-bottom: 14px;
 }
 
 .petugas b {
@@ -140,36 +145,46 @@ button.logout {
   display: inline-block;
   margin-top: 8px;
   padding: 7px 12px;
-  border-radius: 18px;
+  border-radius: 20px;
   font-size: 13px;
   font-weight: bold;
 }
 
 .buka {
-  background: #e8f5e9;
   color: #1b5e20;
+  background: #e8f5e9;
 }
 
 .telat {
-  background: #fff3e0;
   color: #e65100;
+  background: #fff3e0;
 }
 
 .tutup {
-  background: #eee;
   color: #555;
+  background: #eee;
 }
+
+/* MENU */
 
 .menu {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 9px;
-  margin-bottom: 15px;
+  grid-template-columns:
+    1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
 }
 
 .menu button {
   margin: 0;
 }
+
+.menu .lebar {
+  grid-column:
+    1 / 3;
+}
+
+/* CAMERA */
 
 .camera-box {
   overflow: hidden;
@@ -179,28 +194,28 @@ button.logout {
 
 video {
   width: 100%;
-  min-height: 280px;
+  min-height: 275px;
   display: block;
   object-fit: cover;
 }
 
-.status {
+.center {
   text-align: center;
-  min-height: 24px;
-  margin-top: 11px;
 }
 
 .hasil {
   display: none;
-  text-align: center;
-  margin-top: 14px;
   background: white;
+  padding: 17px;
   border-radius: 14px;
-  padding: 18px;
+  margin-top: 12px;
+  text-align: center;
 }
 
-.hasil h3 {
-  margin-top: 0;
+.nama-siswa {
+  font-size: 21px;
+  font-weight: bold;
+  margin: 6px 0;
 }
 
 .sukses {
@@ -215,74 +230,115 @@ video {
   color: #b71c1c;
 }
 
-.nama-siswa {
-  font-size: 21px;
-  font-weight: bold;
-  margin: 7px 0;
+
+/* DASHBOARD */
+
+.grid-status {
+  display: grid;
+  grid-template-columns:
+    repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 13px;
 }
 
-.detail {
-  color: #555;
-  line-height: 1.6;
-}
-
-.counter {
+.stat {
+  padding: 12px 8px;
+  border-radius: 11px;
+  background: #f5f5f5;
   text-align: center;
-  margin-bottom: 12px;
 }
 
-.counter strong {
+.stat .angka {
+  font-size: 23px;
+  font-weight: bold;
   color: #1b5e20;
-  font-size: 20px;
 }
 
-#halamanAplikasi,
-#halamanManual {
-  display: none;
-}
-
-.hasil-cari {
-  margin-top: 12px;
-}
-
-.siswa-item {
-  border: 1px solid #ddd;
-  padding: 12px;
-  border-radius: 10px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  background: white;
-}
-
-.siswa-item:hover {
-  background: #f1f8f2;
-}
-
-.siswa-item.terpilih {
-  border: 2px solid #1b5e20;
-  background: #e8f5e9;
-}
-
-.siswa-item b {
-  display: block;
-  margin-bottom: 4px;
-}
-
-.siswa-item small {
+.stat small {
   color: #666;
 }
 
-.pilihan-siswa {
-  display: none;
-  background: #e8f5e9;
-  border-radius: 10px;
-  padding: 13px;
-  margin-top: 12px;
+.filter-row {
+  display: grid;
+  grid-template-columns:
+    1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
-#alasanLain {
-  display: none;
+.siswa-status {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 11px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.siswa-top {
+  display: flex;
+  justify-content:
+    space-between;
+  gap: 10px;
+}
+
+.siswa-info {
+  flex: 1;
+}
+
+.siswa-info b {
+  display: block;
+  margin-bottom: 3px;
+}
+
+.siswa-info small {
+  color: #666;
+}
+
+.badge {
+  display: inline-block;
+  padding: 5px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.badge-hadir {
+  background: #e8f5e9;
+  color: #1b5e20;
+}
+
+.badge-terlambat {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.badge-absen {
+  background: #ffebee;
+  color: #b71c1c;
+}
+
+.badge-lain {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.btn-kecil {
+  padding: 8px;
+  font-size: 13px;
   margin-top: 8px;
+}
+
+#halamanApp,
+#halamanManual,
+#halamanStatus {
+  display: none;
+}
+
+#panelUbahStatus {
+  display: none;
+  border:
+    2px solid #1b5e20;
 }
 
 </style>
@@ -294,322 +350,493 @@ video {
 
 <div class="container">
 
-  <div class="header">
+<div class="header">
 
-    <h1>SMP ISLAM CIPAKU</h1>
+<h1>
+SMP ISLAM CIPAKU
+</h1>
 
-    <h2>ABSENSI KEGIATAN PAGI</h2>
+<h2>
+ABSENSI KEGIATAN PAGI
+</h2>
 
-    <div
-      class="tanggal"
-      id="tanggal"
-    ></div>
+<div
+class="tanggal"
+id="tanggal">
+</div>
 
-  </div>
+</div>
 
 
-  <!-- LOGIN -->
+<!-- LOGIN -->
 
-  <div id="halamanLogin">
+<div id="halamanLogin">
 
-    <div class="card">
+<div class="card">
 
-      <h3 style="text-align:center;color:#1b5e20;">
-        LOGIN PETUGAS
-      </h3>
+<h3
+class="center sukses">
+LOGIN PETUGAS
+</h3>
 
-      <div id="loadingGuru">
-        Memuat daftar guru...
-      </div>
+<div id="loadingGuru">
+Memuat daftar guru...
+</div>
 
-      <div
-        id="formLogin"
-        style="display:none;"
-      >
+<div
+id="formLogin"
+style="display:none;">
 
-        <label>Nama Guru</label>
+<label>
+Nama Guru
+</label>
 
-        <select id="guru">
+<select id="guru">
 
-          <option value="">
-            -- Pilih nama guru --
-          </option>
+<option value="">
+-- Pilih nama guru --
+</option>
 
-        </select>
+</select>
 
+<label>
+PIN
+</label>
 
-        <label>PIN</label>
+<input
+id="pin"
+type="password"
+inputmode="numeric"
+maxlength="4"
+placeholder="••••">
 
-        <input
-          id="pin"
-          type="password"
-          inputmode="numeric"
-          maxlength="4"
-          placeholder="••••"
-        >
+<button id="login">
+MASUK
+</button>
 
+<div
+id="pesanLogin"
+class="center error">
+</div>
 
-        <button id="login">
-          MASUK
-        </button>
+</div>
 
+</div>
 
-        <div
-          class="status error"
-          id="pesanLogin"
-        ></div>
+</div>
 
-      </div>
 
-    </div>
+<!-- APP -->
 
-  </div>
+<div id="halamanApp">
 
+<div class="petugas">
 
-  <!-- APLIKASI -->
+<div>
+<small>PETUGAS</small><br>
+<b id="namaPetugas"></b>
+</div>
 
-  <div id="halamanAplikasi">
+<button
+id="logout"
+class="logout">
+Keluar
+</button>
 
-    <div class="petugas">
+</div>
 
-      <div>
-        <small>PETUGAS</small><br>
-        <b id="namaPetugas"></b>
-      </div>
 
-      <button
-        id="logout"
-        class="logout"
-      >
-        Keluar
-      </button>
+<div class="card jadwal">
 
-    </div>
+<small>
+KEGIATAN SAAT INI
+</small>
 
+<div
+class="kegiatan"
+id="kegiatan">
+Memuat...
+</div>
 
-    <div class="card jadwal">
+<div id="jam"></div>
 
-      <small>KEGIATAN SAAT INI</small>
+<div
+id="statusWaktu"
+class="status-waktu tutup">
+Memuat...
+</div>
 
-      <div
-        class="kegiatan"
-        id="kegiatan"
-      >
-        Memuat...
-      </div>
+</div>
 
-      <div id="jam"></div>
 
-      <div
-        id="statusWaktu"
-        class="status-waktu tutup"
-      >
-        Memuat...
-      </div>
+<!-- MENU -->
 
-    </div>
+<div class="menu">
 
+<button id="menuQR">
+📷 SCAN QR
+</button>
 
-    <div class="menu">
+<button
+id="menuManual"
+class="secondary">
+✍️ ABSEN MANUAL
+</button>
 
-      <button
-        id="menuQR"
-        class="active-menu"
-      >
-        📷 SCAN QR
-      </button>
+<button
+id="menuStatus"
+class="secondary lebar">
+👥 KEHADIRAN & BELUM ABSEN
+</button>
 
-      <button
-        id="menuManual"
-        class="secondary"
-      >
-        ✍️ ABSEN MANUAL
-      </button>
+</div>
 
-    </div>
 
+<!-- QR -->
 
-    <!-- QR -->
+<div id="halamanQR">
 
-    <div id="halamanQR">
+<div class="card center">
 
-      <div class="counter">
+Presensi sesi ini:
+<b
+id="counter"
+class="sukses">
+0
+</b>
 
-        Presensi sesi ini:
-        <strong id="counter">0</strong>
+</div>
 
-      </div>
+<div class="camera-box">
 
+<video id="qr-video"></video>
 
-      <div class="camera-box">
+</div>
 
-        <video id="qr-video"></video>
+<button id="mulaiScan">
+📷 MULAI SCAN
+</button>
 
-      </div>
+<div
+id="statusScanner"
+class="center">
+Kamera belum dinyalakan.
+</div>
 
+<div
+id="hasilQR"
+class="hasil">
 
-      <button id="mulaiScan">
-        📷 MULAI SCAN
-      </button>
+<h3 id="judulQR"></h3>
 
+<div
+id="namaQR"
+class="nama-siswa">
+</div>
 
-      <div
-        class="status"
-        id="statusScanner"
-      >
-        Kamera belum dinyalakan.
-      </div>
+<div id="kelasQR"></div>
 
+<div id="detailQR"></div>
 
-      <div
-        class="hasil"
-        id="hasilQR"
-      >
+</div>
 
-        <h3 id="judulQR"></h3>
+</div>
 
-        <div id="idQR"></div>
 
-        <div
-          class="nama-siswa"
-          id="namaQR"
-        ></div>
+<!-- MANUAL -->
 
-        <div id="kelasQR"></div>
+<div id="halamanManual">
 
-        <div
-          class="detail"
-          id="detailQR"
-        ></div>
+<div class="card">
 
-      </div>
+<h3>
+✍️ Absen Manual
+</h3>
 
-    </div>
+<input
+id="pencarian"
+placeholder="Nama / NIS / ID siswa">
 
+<button id="cariSiswa">
+🔎 CARI SISWA
+</button>
 
-    <!-- MANUAL -->
+<div id="hasilCari"></div>
 
-    <div id="halamanManual">
+<div
+id="formManual"
+style="display:none;">
 
-      <div class="card">
+<div
+id="siswaManual"
+class="card">
+</div>
 
-        <h3 style="margin-top:0;">
-          ✍️ Absen Manual
-        </h3>
+<label>
+Alasan
+</label>
 
-        <p style="color:#666;">
-          Cari berdasarkan nama, NIS,
-          atau ID siswa.
-        </p>
+<select id="alasan">
 
+<option>
+Lupa membawa kartu
+</option>
 
-        <input
-          id="pencarian"
-          type="text"
-          placeholder="Contoh: Abgari / 12345 / S001"
-        >
+<option>
+Kartu hilang
+</option>
 
+<option>
+Kartu rusak
+</option>
 
-        <button id="cariSiswa">
-          🔎 CARI SISWA
-        </button>
+<option>
+QR tidak terbaca
+</option>
 
+<option value="Lainnya">
+Lainnya
+</option>
 
-        <div
-          class="hasil-cari"
-          id="hasilCari"
-        ></div>
+</select>
 
+<input
+id="alasanLain"
+style="display:none;margin-top:8px;"
+placeholder="Tuliskan alasan">
 
-        <div
-          class="pilihan-siswa"
-          id="pilihanSiswa"
-        >
+<button id="simpanManual">
+✅ CATAT PRESENSI
+</button>
 
-          <small>SISWA TERPILIH</small>
+</div>
 
-          <div
-            class="nama-siswa"
-            id="namaManual"
-          ></div>
+<div
+id="hasilManual"
+class="hasil">
+</div>
 
-          <div id="kelasManual"></div>
+</div>
 
-        </div>
+</div>
 
 
-        <div id="formManual"
-        style="display:none;">
+<!-- STATUS -->
 
-          <label>
-            Alasan Absen Manual
-          </label>
+<div id="halamanStatus">
 
-          <select id="alasan">
+<div class="grid-status">
 
-            <option value="Lupa membawa kartu">
-              Lupa membawa kartu
-            </option>
+<div class="stat">
+<div
+class="angka"
+id="stTotal">
+0
+</div>
+<small>Total Siswa</small>
+</div>
 
-            <option value="Kartu hilang">
-              Kartu hilang
-            </option>
+<div class="stat">
+<div
+class="angka"
+id="stHadir">
+0
+</div>
+<small>Hadir</small>
+</div>
 
-            <option value="Kartu rusak">
-              Kartu rusak
-            </option>
+<div class="stat">
+<div
+class="angka"
+id="stTerlambat">
+0
+</div>
+<small>Terlambat</small>
+</div>
 
-            <option value="QR tidak terbaca">
-              QR tidak terbaca
-            </option>
+<div class="stat">
+<div
+class="angka"
+id="stBelum">
+0
+</div>
+<small id="labelBelum">
+Belum Absen
+</small>
+</div>
 
-            <option value="Lainnya">
-              Lainnya
-            </option>
+<div class="stat">
+<div
+class="angka"
+id="stSakit">
+0
+</div>
+<small>Sakit</small>
+</div>
 
-          </select>
+<div class="stat">
+<div
+class="angka"
+id="stIzin">
+0
+</div>
+<small>Izin</small>
+</div>
 
+<div class="stat">
+<div
+class="angka"
+id="stAlpa">
+0
+</div>
+<small>Alpa</small>
+</div>
 
-          <input
-            id="alasanLain"
-            type="text"
-            placeholder="Tuliskan alasan..."
-          >
+<div class="stat">
+<div
+class="angka"
+id="stHaid">
+0
+</div>
+<small>Haid</small>
+</div>
 
+</div>
 
-          <button id="simpanManual">
-            ✅ CATAT PRESENSI
-          </button>
 
-        </div>
+<div class="card">
 
+<div class="filter-row">
 
-        <div
-          class="hasil"
-          id="hasilManual"
-        >
+<select id="filterKelas">
+<option value="">
+Semua Kelas
+</option>
+</select>
 
-          <h3 id="judulManual"></h3>
+<select id="filterStatus">
 
-          <div
-            class="nama-siswa"
-            id="hasilNamaManual"
-          ></div>
+<option value="PERLU">
+Belum / Tidak Hadir
+</option>
 
-          <div id="hasilKelasManual"></div>
+<option value="">
+Semua Status
+</option>
 
-          <div
-            class="detail"
-            id="detailManual"
-          ></div>
+<option value="Hadir">
+Hadir
+</option>
 
-        </div>
+<option value="Terlambat">
+Terlambat
+</option>
 
-      </div>
+<option value="Sakit">
+Sakit
+</option>
 
-    </div>
+<option value="Izin">
+Izin
+</option>
 
-  </div>
+<option value="Alpa">
+Alpa
+</option>
+
+<option value="Haid">
+Haid
+</option>
+
+</select>
+
+</div>
+
+<input
+id="cariStatus"
+placeholder="Cari nama siswa...">
+
+<button id="refreshStatus">
+🔄 PERBARUI DATA
+</button>
+
+</div>
+
+
+<!-- FORM UBAH STATUS -->
+
+<div
+id="panelUbahStatus"
+class="card">
+
+<h3>
+Ubah Status
+</h3>
+
+<div
+id="namaUbah"
+class="nama-siswa">
+</div>
+
+<div id="infoUbah"></div>
+
+<label>
+Status Baru
+</label>
+
+<select id="statusBaru">
+
+<option value="SAKIT">
+Sakit
+</option>
+
+<option value="IZIN">
+Izin
+</option>
+
+<option value="ALPA">
+Alpa
+</option>
+
+<option value="TERLAMBAT">
+Terlambat
+</option>
+
+</select>
+
+<label>
+Catatan
+</label>
+
+<textarea
+id="catatanStatus"
+placeholder="Opsional, misalnya: surat dari orang tua">
+</textarea>
+
+<button id="simpanStatus">
+✅ SIMPAN PERUBAHAN
+</button>
+
+<button
+id="batalStatus"
+class="secondary">
+BATAL
+</button>
+
+</div>
+
+
+<div
+id="loadingStatus"
+class="center">
+</div>
+
+<div id="daftarStatus">
+</div>
+
+</div>
+
+</div>
 
 </div>
 
@@ -625,15 +852,15 @@ const API =
 
 
 let token =
-  localStorage.getItem(
-    "absensi_token"
-  ) || "";
+localStorage.getItem(
+"absensi_token"
+) || "";
 
 
 let namaGuru =
-  localStorage.getItem(
-    "absensi_guru"
-  ) || "";
+localStorage.getItem(
+"absensi_guru"
+) || "";
 
 
 let kegiatanAktif = "";
@@ -642,91 +869,169 @@ let scannerAktif = false;
 
 let proses = false;
 
-let total = 0;
+let totalScan = 0;
 
-let siswaTerpilih = null;
+let siswaManual = null;
+
+let dataStatus = [];
+
+let siswaUbah = null;
+
+
+/* ===============================
+   UTIL
+================================ */
+
+function post(data) {
+
+return fetch(
+API,
+{
+method: "POST",
+
+headers: {
+"Content-Type":
+"text/plain;charset=UTF-8"
+},
+
+body:
+JSON.stringify(data)
+}
+)
+.then(
+r => r.json()
+)
+.catch(
+() => ({
+berhasil:false,
+pesan:
+"Tidak dapat terhubung ke server."
+})
+);
+
+}
+
+
+function keluarLocal() {
+
+localStorage.removeItem(
+"absensi_token"
+);
+
+localStorage.removeItem(
+"absensi_guru"
+);
+
+location.reload();
+
+}
+
+
+function cekLoginHabis(d) {
+
+if (
+d &&
+d.harusLogin
+) {
+
+alert(
+"Sesi login habis. Silakan login kembali."
+);
+
+keluarLocal();
+
+return true;
+
+}
+
+return false;
+
+}
 
 
 /* TANGGAL */
 
 document.getElementById(
-  "tanggal"
+"tanggal"
 ).textContent =
-  new Date()
-    .toLocaleDateString(
-      "id-ID",
-      {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-      }
-    );
+new Date()
+.toLocaleDateString(
+"id-ID",
+{
+weekday:"long",
+day:"numeric",
+month:"long",
+year:"numeric"
+}
+);
 
 
-/* LOAD GURU */
+/* ===============================
+   LOGIN
+================================ */
 
 async function loadGuru() {
 
-  try {
+try {
 
-    const r =
-      await fetch(
-        API +
-        "?action=daftarGuru"
-      );
-
-
-    const d =
-      await r.json();
+const r =
+await fetch(
+API +
+"?action=daftarGuru"
+);
 
 
-    const guru =
-      document.getElementById(
-        "guru"
-      );
+const d =
+await r.json();
 
 
-    d.data.forEach(
-      x => {
-
-        const o =
-          document.createElement(
-            "option"
-          );
-
-        o.value =
-          x.id;
-
-        o.textContent =
-          x.nama;
-
-        guru.appendChild(o);
-
-      }
-    );
+const select =
+document.getElementById(
+"guru"
+);
 
 
-    document.getElementById(
-      "loadingGuru"
-    ).style.display =
-      "none";
+d.data.forEach(
+g => {
+
+const op =
+document.createElement(
+"option"
+);
+
+op.value = g.id;
+
+op.textContent =
+g.nama;
+
+select.appendChild(
+op
+);
+
+}
+);
 
 
-    document.getElementById(
-      "formLogin"
-    ).style.display =
-      "block";
+document.getElementById(
+"loadingGuru"
+).style.display =
+"none";
 
 
-  } catch {
+document.getElementById(
+"formLogin"
+).style.display =
+"block";
 
-    document.getElementById(
-      "loadingGuru"
-    ).textContent =
-      "Gagal memuat guru.";
 
-  }
+} catch {
+
+document.getElementById(
+"loadingGuru"
+).textContent =
+"Gagal memuat guru.";
+
+}
 
 }
 
@@ -734,84 +1039,62 @@ async function loadGuru() {
 loadGuru();
 
 
-/* LOGIN */
-
 document.getElementById(
-  "login"
+"login"
 ).onclick =
 async function() {
 
-  const idGuru =
-    document.getElementById(
-      "guru"
-    ).value;
+const idGuru =
+document.getElementById(
+"guru"
+).value;
 
 
-  const pin =
-    document.getElementById(
-      "pin"
-    ).value;
+const pin =
+document.getElementById(
+"pin"
+).value;
 
 
-  const pesan =
-    document.getElementById(
-      "pesanLogin"
-    );
+const d =
+await post({
+action:"loginGuru",
+idGuru:idGuru,
+pin:pin
+});
 
 
-  pesan.textContent = "";
+if (!d.berhasil) {
+
+document.getElementById(
+"pesanLogin"
+).textContent =
+d.pesan;
+
+return;
+
+}
 
 
-  if (
-    !idGuru ||
-    !pin
-  ) {
+token = d.token;
 
-    pesan.textContent =
-      "Pilih guru dan masukkan PIN.";
-
-    return;
-
-  }
+namaGuru =
+d.guru.nama;
 
 
-  const r =
-    await post({
-      action: "loginGuru",
-      idGuru,
-      pin
-    });
+localStorage.setItem(
+"absensi_token",
+token
+);
 
 
-  if (!r.berhasil) {
-
-    pesan.textContent =
-      r.pesan;
-
-    return;
-
-  }
+localStorage.setItem(
+"absensi_guru",
+namaGuru
+);
 
 
-  token = r.token;
-
-  namaGuru =
-    r.guru.nama;
-
-
-  localStorage.setItem(
-    "absensi_token",
-    token
-  );
-
-
-  localStorage.setItem(
-    "absensi_guru",
-    namaGuru
-  );
-
-
-  bukaAplikasi();
+bukaApp();
 
 };
 
@@ -819,60 +1102,60 @@ async function() {
 /* ENTER PIN */
 
 document.getElementById(
-  "pin"
+"pin"
 ).addEventListener(
-  "keydown",
-  e => {
+"keydown",
+e => {
 
-    if (
-      e.key === "Enter"
-    ) {
+if (
+e.key === "Enter"
+) {
 
-      document
-        .getElementById(
-          "login"
-        )
-        .click();
+document.getElementById(
+"login"
+).click();
 
-    }
+}
 
-  }
+}
 );
 
 
-/* BUKA APP */
+/* ===============================
+   APP
+================================ */
 
-function bukaAplikasi() {
+function bukaApp() {
 
-  document.getElementById(
-    "halamanLogin"
-  ).style.display =
-    "none";
-
-
-  document.getElementById(
-    "halamanAplikasi"
-  ).style.display =
-    "block";
+document.getElementById(
+"halamanLogin"
+).style.display =
+"none";
 
 
-  document.getElementById(
-    "namaPetugas"
-  ).textContent =
-    namaGuru;
+document.getElementById(
+"halamanApp"
+).style.display =
+"block";
 
 
-  loadKegiatan();
+document.getElementById(
+"namaPetugas"
+).textContent =
+namaGuru;
+
+
+loadKegiatan();
 
 }
 
 
 if (
-  token &&
-  namaGuru
+token &&
+namaGuru
 ) {
 
-  bukaAplikasi();
+bukaApp();
 
 }
 
@@ -880,1110 +1163,1485 @@ if (
 /* LOGOUT */
 
 document.getElementById(
-  "logout"
+"logout"
 ).onclick =
 async function() {
 
-  scannerAktif = false;
+scannerAktif = false;
 
-  scanner.stop();
-
-
-  await post({
-    action: "logoutGuru",
-    token
-  });
+scanner.stop();
 
 
-  localStorage.clear();
+await post({
+action:"logoutGuru",
+token:token
+});
 
-  location.reload();
+
+keluarLocal();
 
 };
 
 
-/* JADWAL */
+/* ===============================
+   JADWAL
+================================ */
 
 async function loadKegiatan() {
 
-  try {
+try {
 
-    const r =
-      await fetch(
-        API +
-        "?action=kegiatanSekarang"
-      );
-
-
-    const d =
-      await r.json();
+const r =
+await fetch(
+API +
+"?action=kegiatanSekarang"
+);
 
 
-    const kegiatan =
-      document.getElementById(
-        "kegiatan"
-      );
+const d =
+await r.json();
 
 
-    const jam =
-      document.getElementById(
-        "jam"
-      );
+const kegiatan =
+document.getElementById(
+"kegiatan"
+);
 
 
-    const sw =
-      document.getElementById(
-        "statusWaktu"
-      );
+const jam =
+document.getElementById(
+"jam"
+);
 
 
-    if (
-      d.berhasil &&
-      d.adaKegiatan
-    ) {
-
-      kegiatanAktif =
-        d.kegiatan;
+const sw =
+document.getElementById(
+"statusWaktu"
+);
 
 
-      kegiatan.textContent =
-        d.kegiatan;
+if (
+d.berhasil &&
+d.adaKegiatan
+) {
+
+kegiatanAktif =
+d.kegiatan;
 
 
-      jam.textContent =
-        d.mulai +
-        " - " +
-        d.tutup;
+kegiatan.textContent =
+d.kegiatan;
 
 
-      if (
-        d.statusWaktu ===
-        "SEDANG BERLANGSUNG"
-      ) {
-
-        sw.textContent =
-          "🟢 ABSENSI DIBUKA";
-
-        sw.className =
-          "status-waktu buka";
-
-      } else {
-
-        sw.textContent =
-          "🟠 TERLAMBAT";
-
-        sw.className =
-          "status-waktu telat";
-
-      }
+jam.textContent =
+d.mulai +
+" - " +
+d.tutup;
 
 
-      return;
+if (
+d.statusWaktu ===
+"SEDANG BERLANGSUNG"
+) {
 
-    }
+sw.textContent =
+"🟢 ABSENSI DIBUKA";
 
+sw.className =
+"status-waktu buka";
 
-    kegiatanAktif = "";
+} else {
 
+sw.textContent =
+"🟠 TERLAMBAT";
 
-    kegiatan.textContent =
-      "Tidak Ada Kegiatan";
-
-
-    jam.textContent = "";
-
-
-    sw.textContent =
-      d.pesan ||
-      "Tidak ada kegiatan.";
-
-
-    sw.className =
-      "status-waktu tutup";
-
-
-  } catch {
-
-    kegiatanAktif = "";
-
-  }
+sw.className =
+"status-waktu telat";
 
 }
 
 
-/* MENU */
+return;
+
+}
+
+
+kegiatanAktif = "";
+
+
+kegiatan.textContent =
+"Tidak Ada Kegiatan";
+
+jam.textContent = "";
+
+sw.textContent =
+d.pesan ||
+"Tidak ada kegiatan.";
+
+sw.className =
+"status-waktu tutup";
+
+
+} catch {
+
+kegiatanAktif = "";
+
+}
+
+}
+
+
+/* ===============================
+   MENU
+================================ */
+
+function bukaMenu(nama) {
 
 document.getElementById(
-  "menuQR"
-).onclick =
-function() {
-
-  document.getElementById(
-    "halamanQR"
-  ).style.display =
-    "block";
-
-
-  document.getElementById(
-    "halamanManual"
-  ).style.display =
-    "none";
-
-
-  this.className =
-    "active-menu";
-
-
-  document.getElementById(
-    "menuManual"
-  ).className =
-    "secondary";
-
-};
+"halamanQR"
+).style.display =
+nama === "QR"
+? "block"
+: "none";
 
 
 document.getElementById(
-  "menuManual"
+"halamanManual"
+).style.display =
+nama === "MANUAL"
+? "block"
+: "none";
+
+
+document.getElementById(
+"halamanStatus"
+).style.display =
+nama === "STATUS"
+? "block"
+: "none";
+
+
+if (
+nama !== "QR" &&
+scannerAktif
+) {
+
+scannerAktif = false;
+
+scanner.stop();
+
+document.getElementById(
+"mulaiScan"
+).textContent =
+"📷 MULAI SCAN";
+
+}
+
+
+if (
+nama === "STATUS"
+) {
+
+loadStatus();
+
+}
+
+}
+
+
+document.getElementById(
+"menuQR"
 ).onclick =
-function() {
-
-  if (scannerAktif) {
-
-    scannerAktif = false;
-
-    scanner.stop();
-
-    document.getElementById(
-      "mulaiScan"
-    ).textContent =
-      "📷 MULAI SCAN";
-
-  }
+() => bukaMenu("QR");
 
 
-  document.getElementById(
-    "halamanQR"
-  ).style.display =
-    "none";
+document.getElementById(
+"menuManual"
+).onclick =
+() => bukaMenu("MANUAL");
 
 
-  document.getElementById(
-    "halamanManual"
-  ).style.display =
-    "block";
+document.getElementById(
+"menuStatus"
+).onclick =
+() => bukaMenu("STATUS");
 
 
-  this.className =
-    "active-menu";
-
-
-  document.getElementById(
-    "menuQR"
-  ).className =
-    "secondary";
-
-};
-
-
-/* QR SCANNER */
+/* ===============================
+   QR
+================================ */
 
 const scanner =
 new QrScanner(
 
-  document.getElementById(
-    "qr-video"
-  ),
+document.getElementById(
+"qr-video"
+),
 
-  async hasil => {
+async hasil => {
 
-    if (
-      proses ||
-      !scannerAktif
-    ) return;
-
-
-    proses = true;
+if (
+proses ||
+!scannerAktif
+) return;
 
 
-    await scanner.pause();
+proses = true;
+
+await scanner.pause();
 
 
-    await catatQR(
-      String(
-        hasil.data
-      ).trim()
-    );
+const d =
+await post({
+
+action:
+"catatPresensi",
+
+idSiswa:
+String(
+hasil.data
+).trim(),
+
+kegiatan:
+kegiatanAktif,
+
+token:token,
+
+metode:"QR",
+
+alasan:"-"
+
+});
 
 
-    await delay(
-      1500
-    );
+tampilQR(
+d
+);
 
 
-    if (scannerAktif) {
-
-      document.getElementById(
-        "hasilQR"
-      ).style.display =
-        "none";
-
-
-      proses = false;
+await new Promise(
+r =>
+setTimeout(
+r,
+1500
+)
+);
 
 
-      await scanner.start();
+if (
+scannerAktif
+) {
 
-    } else {
+document.getElementById(
+"hasilQR"
+).style.display =
+"none";
 
-      proses = false;
 
-    }
+proses = false;
 
-  },
+await scanner.start();
 
-  {
-    preferredCamera:
-      "environment",
+} else {
 
-    highlightScanRegion:
-      true,
+proses = false;
 
-    highlightCodeOutline:
-      true,
+}
 
-    returnDetailedScanResult:
-      true
-  }
+},
+
+{
+preferredCamera:
+"environment",
+
+highlightScanRegion:
+true,
+
+highlightCodeOutline:
+true,
+
+returnDetailedScanResult:
+true
+}
 
 );
 
 
-/* START SCAN */
-
 document.getElementById(
-  "mulaiScan"
+"mulaiScan"
 ).onclick =
 async function() {
 
-  if (scannerAktif) {
+if (
+scannerAktif
+) {
 
-    scannerAktif = false;
+scannerAktif = false;
 
-    scanner.stop();
+scanner.stop();
 
+this.textContent =
+"📷 MULAI SCAN";
 
-    this.textContent =
-      "📷 MULAI SCAN";
+this.className = "";
 
+return;
 
-    this.className = "";
-
-
-    return;
-
-  }
-
-
-  if (!kegiatanAktif) {
-
-    document.getElementById(
-      "statusScanner"
-    ).textContent =
-      "❌ Tidak ada kegiatan aktif.";
-
-    return;
-
-  }
+}
 
 
-  try {
+if (
+!kegiatanAktif
+) {
 
-    await scanner.start();
+document.getElementById(
+"statusScanner"
+).textContent =
+"❌ Tidak ada kegiatan aktif.";
 
+return;
 
-    scannerAktif = true;
-
-
-    this.textContent =
-      "⏹ SELESAI SCAN";
-
-
-    this.className =
-      "stop";
+}
 
 
-    document.getElementById(
-      "statusScanner"
-    ).textContent =
-      "Arahkan kamera ke QR siswa.";
+try {
+
+await scanner.start();
+
+scannerAktif = true;
+
+this.textContent =
+"⏹ SELESAI SCAN";
+
+this.className =
+"stop";
 
 
-  } catch {
+document.getElementById(
+"statusScanner"
+).textContent =
+"Arahkan kamera ke QR siswa.";
 
-    document.getElementById(
-      "statusScanner"
-    ).textContent =
-      "Kamera gagal dibuka.";
 
-  }
+} catch {
+
+document.getElementById(
+"statusScanner"
+).textContent =
+"Kamera gagal dibuka.";
+
+}
 
 };
 
 
-/* CATAT QR */
+function tampilQR(d) {
 
-async function catatQR(
-  id
+if (
+cekLoginHabis(d)
+) return;
+
+
+const box =
+document.getElementById(
+"hasilQR"
+);
+
+
+box.style.display =
+"block";
+
+
+if (
+d.berhasil
 ) {
 
-  const d =
-    await post({
+totalScan++;
 
-      action:
-        "catatPresensi",
-
-      idSiswa: id,
-
-      kegiatan:
-        kegiatanAktif,
-
-      token: token,
-
-      metode: "QR",
-
-      alasan: "-"
-
-    });
-
-
-  tampilkanHasilQR(
-    id,
-    d
-  );
-
-}
-
-
-/* HASIL QR */
-
-function tampilkanHasilQR(
-  id,
-  d
-) {
-
-  const box =
-    document.getElementById(
-      "hasilQR"
-    );
-
-
-  box.style.display =
-    "block";
-
-
-  if (d.harusLogin) {
-
-    alert(
-      "Sesi login habis."
-    );
-
-    localStorage.clear();
-
-    location.reload();
-
-    return;
-
-  }
-
-
-  if (d.berhasil) {
-
-    total++;
-
-
-    document.getElementById(
-      "counter"
-    ).textContent =
-      total;
-
-
-    document.getElementById(
-      "judulQR"
-    ).textContent =
-      "✅ PRESENSI BERHASIL";
-
-
-    document.getElementById(
-      "judulQR"
-    ).className =
-      "sukses";
-
-
-    document.getElementById(
-      "namaQR"
-    ).textContent =
-      d.nama;
-
-
-    document.getElementById(
-      "kelasQR"
-    ).textContent =
-      "Kelas " +
-      d.kelas;
-
-
-    document.getElementById(
-      "idQR"
-    ).textContent =
-      id;
-
-
-    document.getElementById(
-      "detailQR"
-    ).innerHTML =
-      "Status: <b>" +
-      d.status +
-      "</b><br>" +
-      "Jam: <b>" +
-      d.jam +
-      "</b><br>" +
-      "Petugas: <b>" +
-      d.petugas +
-      "</b>";
-
-
-    getar(
-      [80,60,80]
-    );
-
-
-  } else if (
-    d.sudahAbsen
-  ) {
-
-    document.getElementById(
-      "judulQR"
-    ).textContent =
-      "⚠️ SUDAH ABSEN";
-
-
-    document.getElementById(
-      "judulQR"
-    ).className =
-      "warning";
-
-
-    document.getElementById(
-      "namaQR"
-    ).textContent =
-      d.nama;
-
-
-    document.getElementById(
-      "kelasQR"
-    ).textContent =
-      "Kelas " +
-      d.kelas;
-
-
-    document.getElementById(
-      "detailQR"
-    ).innerHTML =
-      "Sudah tercatat pukul <b>" +
-      d.jamSebelumnya +
-      "</b>";
-
-
-    getar(
-      [250,80,250]
-    );
-
-
-  } else {
-
-    document.getElementById(
-      "judulQR"
-    ).textContent =
-      "❌ GAGAL";
-
-
-    document.getElementById(
-      "judulQR"
-    ).className =
-      "error";
-
-
-    document.getElementById(
-      "namaQR"
-    ).textContent =
-      "";
-
-
-    document.getElementById(
-      "kelasQR"
-    ).textContent =
-      "";
-
-
-    document.getElementById(
-      "detailQR"
-    ).textContent =
-      d.pesan;
-
-  }
-
-}
-
-
-/* ==========================
-   ABSEN MANUAL
-========================== */
-
-
-/* ALASAN LAIN */
 
 document.getElementById(
-  "alasan"
+"counter"
+).textContent =
+totalScan;
+
+
+document.getElementById(
+"judulQR"
+).textContent =
+"✅ PRESENSI BERHASIL";
+
+
+document.getElementById(
+"judulQR"
+).className =
+"sukses";
+
+
+document.getElementById(
+"namaQR"
+).textContent =
+d.nama;
+
+
+document.getElementById(
+"kelasQR"
+).textContent =
+"Kelas " +
+d.kelas;
+
+
+document.getElementById(
+"detailQR"
+).innerHTML =
+"Status: <b>" +
+d.status +
+"</b><br>" +
+"Jam: <b>" +
+d.jam +
+"</b><br>" +
+"Petugas: <b>" +
+d.petugas +
+"</b>";
+
+
+if (
+navigator.vibrate
+)
+navigator.vibrate(
+[80,60,80]
+);
+
+
+} else if (
+d.sudahAbsen
+) {
+
+document.getElementById(
+"judulQR"
+).textContent =
+"⚠️ SUDAH ABSEN";
+
+
+document.getElementById(
+"judulQR"
+).className =
+"warning";
+
+
+document.getElementById(
+"namaQR"
+).textContent =
+d.nama;
+
+
+document.getElementById(
+"kelasQR"
+).textContent =
+"Kelas " +
+d.kelas;
+
+
+document.getElementById(
+"detailQR"
+).textContent =
+"Sudah tercatat pukul " +
+d.jamSebelumnya;
+
+
+} else {
+
+document.getElementById(
+"judulQR"
+).textContent =
+"❌ GAGAL";
+
+
+document.getElementById(
+"judulQR"
+).className =
+"error";
+
+
+document.getElementById(
+"detailQR"
+).textContent =
+d.pesan;
+
+}
+
+}
+
+
+/* ===============================
+   ABSEN MANUAL
+================================ */
+
+document.getElementById(
+"alasan"
 ).onchange =
 function() {
 
-  document.getElementById(
-    "alasanLain"
-  ).style.display =
-    this.value ===
-    "Lainnya"
-      ? "block"
-      : "none";
+document.getElementById(
+"alasanLain"
+).style.display =
+this.value ===
+"Lainnya"
+? "block"
+: "none";
 
 };
 
 
-/* CARI SISWA */
-
 document.getElementById(
-  "cariSiswa"
+"cariSiswa"
 ).onclick =
 async function() {
 
-  const query =
-    document.getElementById(
-      "pencarian"
-    ).value.trim();
-
-
-  const tempat =
-    document.getElementById(
-      "hasilCari"
-    );
-
-
-  siswaTerpilih = null;
-
-
-  document.getElementById(
-    "pilihanSiswa"
-  ).style.display =
-    "none";
-
-
-  document.getElementById(
-    "formManual"
-  ).style.display =
-    "none";
-
-
-  if (
-    query.length < 2
-  ) {
-
-    tempat.innerHTML =
-      '<div class="error">Ketik minimal 2 karakter.</div>';
-
-    return;
-
-  }
-
-
-  tempat.innerHTML =
-    "Mencari siswa...";
-
-
-  const d =
-    await post({
-
-      action:
-        "cariSiswaManual",
-
-      query: query,
-
-      token: token
-
-    });
-
-
-  if (d.harusLogin) {
-
-    localStorage.clear();
-
-    location.reload();
-
-    return;
-
-  }
-
-
-  if (
-    !d.berhasil
-  ) {
-
-    tempat.textContent =
-      d.pesan;
-
-    return;
-
-  }
-
-
-  if (
-    d.data.length === 0
-  ) {
-
-    tempat.innerHTML =
-      '<div class="error">Siswa tidak ditemukan.</div>';
-
-    return;
-
-  }
-
-
-  tempat.innerHTML = "";
-
-
-  d.data.forEach(
-    siswa => {
-
-      const div =
-        document.createElement(
-          "div"
-        );
-
-
-      div.className =
-        "siswa-item";
-
-
-      div.innerHTML =
-        "<b>" +
-        siswa.nama +
-        "</b>" +
-        "<small>" +
-        siswa.kelas +
-        " • NIS: " +
-        siswa.nis +
-        " • " +
-        siswa.id +
-        "</small>";
-
-
-      div.onclick =
-      function() {
-
-        document
-          .querySelectorAll(
-            ".siswa-item"
-          )
-          .forEach(
-            e =>
-              e.classList
-                .remove(
-                  "terpilih"
-                )
-          );
-
-
-        div.classList.add(
-          "terpilih"
-        );
-
-
-        siswaTerpilih =
-          siswa;
-
-
-        document.getElementById(
-          "namaManual"
-        ).textContent =
-          siswa.nama;
-
-
-        document.getElementById(
-          "kelasManual"
-        ).textContent =
-          "Kelas " +
-          siswa.kelas +
-          " • " +
-          siswa.id;
-
-
-        document.getElementById(
-          "pilihanSiswa"
-        ).style.display =
-          "block";
-
-
-        document.getElementById(
-          "formManual"
-        ).style.display =
-          "block";
-
-      };
-
-
-      tempat.appendChild(
-        div
-      );
-
-    }
-  );
-
-};
-
-
-/* ENTER SEARCH */
-
+const q =
 document.getElementById(
-  "pencarian"
-).addEventListener(
-  "keydown",
-  e => {
+"pencarian"
+).value.trim();
 
-    if (
-      e.key === "Enter"
-    ) {
 
-      document.getElementById(
-        "cariSiswa"
-      ).click();
-
-    }
-
-  }
+const tempat =
+document.getElementById(
+"hasilCari"
 );
 
 
-/* SIMPAN MANUAL */
+siswaManual = null;
+
 
 document.getElementById(
-  "simpanManual"
-).onclick =
-async function() {
-
-  if (
-    !siswaTerpilih
-  ) return;
+"formManual"
+).style.display =
+"none";
 
 
-  if (
-    !kegiatanAktif
-  ) {
+if (
+q.length < 2
+) {
 
-    alert(
-      "Tidak ada kegiatan aktif."
-    );
+tempat.innerHTML =
+'<p class="error">Ketik minimal 2 karakter.</p>';
 
-    return;
+return;
 
-  }
-
-
-  let alasan =
-    document.getElementById(
-      "alasan"
-    ).value;
+}
 
 
-  if (
-    alasan === "Lainnya"
-  ) {
-
-    alasan =
-      document.getElementById(
-        "alasanLain"
-      ).value.trim();
+tempat.innerHTML =
+"Mencari...";
 
 
-    if (!alasan) {
+const d =
+await post({
 
-      alert(
-        "Tuliskan alasan."
-      );
+action:
+"cariSiswaManual",
 
-      return;
+query:q,
 
-    }
+token:token
 
-  }
-
-
-  this.disabled = true;
-
-  this.textContent =
-    "MENYIMPAN...";
+});
 
 
-  const d =
-    await post({
-
-      action:
-        "catatPresensi",
-
-      idSiswa:
-        siswaTerpilih.id,
-
-      kegiatan:
-        kegiatanAktif,
-
-      token: token,
-
-      metode:
-        "MANUAL",
-
-      alasan:
-        alasan
-
-    });
+if (
+cekLoginHabis(d)
+) return;
 
 
-  this.disabled = false;
-
-  this.textContent =
-    "✅ CATAT PRESENSI";
+tempat.innerHTML = "";
 
 
-  tampilkanManual(d);
+if (
+!d.berhasil ||
+d.data.length === 0
+) {
+
+tempat.innerHTML =
+'<p class="error">Siswa tidak ditemukan.</p>';
+
+return;
+
+}
+
+
+d.data.forEach(
+s => {
+
+const div =
+document.createElement(
+"div"
+);
+
+
+div.className =
+"siswa-status";
+
+
+div.innerHTML =
+"<b>" +
+s.nama +
+"</b><br>" +
+"<small>" +
+s.kelas +
+" • " +
+s.id +
+" • NIS " +
+s.nis +
+"</small>";
+
+
+div.onclick =
+function() {
+
+siswaManual = s;
+
+
+document.getElementById(
+"siswaManual"
+).innerHTML =
+"<b>" +
+s.nama +
+"</b><br>Kelas " +
+s.kelas +
+" • " +
+s.id;
+
+
+document.getElementById(
+"formManual"
+).style.display =
+"block";
 
 };
 
 
-/* HASIL MANUAL */
+tempat.appendChild(
+div
+);
 
-function tampilkanManual(
-  d
+}
+);
+
+};
+
+
+document.getElementById(
+"simpanManual"
+).onclick =
+async function() {
+
+if (
+!siswaManual
+) return;
+
+
+if (
+!kegiatanAktif
 ) {
 
-  const box =
-    document.getElementById(
-      "hasilManual"
-    );
+alert(
+"Tidak ada kegiatan aktif."
+);
 
-
-  box.style.display =
-    "block";
-
-
-  if (
-    d.harusLogin
-  ) {
-
-    localStorage.clear();
-
-    location.reload();
-
-    return;
-
-  }
-
-
-  if (d.berhasil) {
-
-    total++;
-
-
-    document.getElementById(
-      "counter"
-    ).textContent =
-      total;
-
-
-    document.getElementById(
-      "judulManual"
-    ).textContent =
-      "✅ PRESENSI MANUAL BERHASIL";
-
-
-    document.getElementById(
-      "judulManual"
-    ).className =
-      "sukses";
-
-
-    document.getElementById(
-      "hasilNamaManual"
-    ).textContent =
-      d.nama;
-
-
-    document.getElementById(
-      "hasilKelasManual"
-    ).textContent =
-      "Kelas " +
-      d.kelas;
-
-
-    document.getElementById(
-      "detailManual"
-    ).innerHTML =
-      "Status: <b>" +
-      d.status +
-      "</b><br>" +
-      "Metode: <b>MANUAL</b><br>" +
-      "Alasan: <b>" +
-      d.alasan +
-      "</b><br>" +
-      "Petugas: <b>" +
-      d.petugas +
-      "</b>";
-
-
-    getar(
-      [80,60,80]
-    );
-
-
-  } else if (
-    d.sudahAbsen
-  ) {
-
-    document.getElementById(
-      "judulManual"
-    ).textContent =
-      "⚠️ SUDAH ABSEN";
-
-
-    document.getElementById(
-      "judulManual"
-    ).className =
-      "warning";
-
-
-    document.getElementById(
-      "hasilNamaManual"
-    ).textContent =
-      d.nama;
-
-
-    document.getElementById(
-      "hasilKelasManual"
-    ).textContent =
-      "Kelas " +
-      d.kelas;
-
-
-    document.getElementById(
-      "detailManual"
-    ).innerHTML =
-      "Siswa sudah tercatat pukul <b>" +
-      d.jamSebelumnya +
-      "</b>";
-
-
-  } else {
-
-    document.getElementById(
-      "judulManual"
-    ).textContent =
-      "❌ PRESENSI GAGAL";
-
-
-    document.getElementById(
-      "judulManual"
-    ).className =
-      "error";
-
-
-    document.getElementById(
-      "detailManual"
-    ).textContent =
-      d.pesan;
-
-  }
+return;
 
 }
 
 
-/* POST */
+let alasan =
+document.getElementById(
+"alasan"
+).value;
 
-async function post(
-  data
+
+if (
+alasan === "Lainnya"
 ) {
 
-  try {
-
-    const r =
-      await fetch(
-        API,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "text/plain;charset=UTF-8"
-          },
-
-          body:
-            JSON.stringify(
-              data
-            )
-        }
-      );
+alasan =
+document.getElementById(
+"alasanLain"
+).value.trim();
 
 
-    return await r.json();
+if (!alasan) {
 
+alert(
+"Tuliskan alasan."
+);
 
-  } catch {
+return;
 
-    return {
-      berhasil: false,
-      pesan:
-        "Tidak dapat terhubung ke server."
-    };
-
-  }
+}
 
 }
 
 
-/* UTIL */
+const d =
+await post({
 
-function delay(ms) {
+action:
+"catatPresensi",
 
-  return new Promise(
-    r =>
-      setTimeout(
-        r,
-        ms
-      )
-  );
+idSiswa:
+siswaManual.id,
 
-}
+kegiatan:
+kegiatanAktif,
+
+token:token,
+
+metode:
+"MANUAL",
+
+alasan:
+alasan
+
+});
 
 
-function getar(
-  pola
+if (
+cekLoginHabis(d)
+) return;
+
+
+const box =
+document.getElementById(
+"hasilManual"
+);
+
+
+box.style.display =
+"block";
+
+
+if (
+d.berhasil
 ) {
 
-  if (
-    navigator.vibrate
-  ) {
+box.innerHTML =
+'<h3 class="sukses">✅ PRESENSI BERHASIL</h3>' +
+'<div class="nama-siswa">' +
+d.nama +
+'</div>' +
+'Kelas ' +
+d.kelas +
+'<br>Status: <b>' +
+d.status +
+'</b><br>Alasan: <b>' +
+d.alasan +
+'</b>';
 
-    navigator.vibrate(
-      pola
-    );
 
-  }
+} else if (
+d.sudahAbsen
+) {
+
+box.innerHTML =
+'<h3 class="warning">⚠️ SUDAH ABSEN</h3>' +
+d.nama;
+
+
+} else {
+
+box.innerHTML =
+'<h3 class="error">❌ GAGAL</h3>' +
+d.pesan;
 
 }
+
+};
+
+
+/* ===============================
+   DASHBOARD STATUS
+================================ */
+
+async function loadStatus() {
+
+if (
+!kegiatanAktif
+) {
+
+document.getElementById(
+"loadingStatus"
+).textContent =
+"Tidak ada kegiatan aktif.";
+
+return;
+
+}
+
+
+document.getElementById(
+"loadingStatus"
+).textContent =
+"Memuat data kehadiran...";
+
+
+const d =
+await post({
+
+action:
+"statusKegiatan",
+
+kegiatan:
+kegiatanAktif,
+
+token:token
+
+});
+
+
+if (
+cekLoginHabis(d)
+) return;
+
+
+if (
+!d.berhasil
+) {
+
+document.getElementById(
+"loadingStatus"
+).textContent =
+d.pesan;
+
+return;
+
+}
+
+
+document.getElementById(
+"loadingStatus"
+).textContent =
+"";
+
+
+dataStatus =
+d.data;
+
+
+/*
+ * RINGKASAN
+ */
+
+const r =
+d.ringkasan;
+
+
+document.getElementById(
+"stTotal"
+).textContent =
+r.total;
+
+
+document.getElementById(
+"stHadir"
+).textContent =
+r.hadir;
+
+
+document.getElementById(
+"stTerlambat"
+).textContent =
+r.terlambat;
+
+
+document.getElementById(
+"stSakit"
+).textContent =
+r.sakit;
+
+
+document.getElementById(
+"stIzin"
+).textContent =
+r.izin;
+
+
+document.getElementById(
+"stAlpa"
+).textContent =
+r.alpa;
+
+
+document.getElementById(
+"stHaid"
+).textContent =
+r.haid;
+
+
+/*
+ * BELUM / TIDAK HADIR
+ */
+
+if (
+r.belumAbsen > 0
+) {
+
+document.getElementById(
+"stBelum"
+).textContent =
+r.belumAbsen;
+
+
+document.getElementById(
+"labelBelum"
+).textContent =
+"Belum Absen";
+
+} else {
+
+document.getElementById(
+"stBelum"
+).textContent =
+r.tidakHadir;
+
+
+document.getElementById(
+"labelBelum"
+).textContent =
+"Tidak Hadir";
+
+}
+
+
+/*
+ * KELAS
+ */
+
+const select =
+document.getElementById(
+"filterKelas"
+);
+
+
+const nilaiLama =
+select.value;
+
+
+const kelas =
+[
+...new Set(
+dataStatus.map(
+x => x.kelas
+)
+)
+];
+
+
+kelas.sort(
+(a,b) =>
+a.localeCompare(
+b,
+"id",
+{numeric:true}
+)
+);
+
+
+select.innerHTML =
+'<option value="">Semua Kelas</option>';
+
+
+kelas.forEach(
+k => {
+
+const op =
+document.createElement(
+"option"
+);
+
+op.value = k;
+
+op.textContent =
+k;
+
+select.appendChild(
+op
+);
+
+}
+);
+
+
+select.value =
+nilaiLama;
+
+
+renderStatus();
+
+}
+
+
+/* FILTER */
+
+function renderStatus() {
+
+const kelas =
+document.getElementById(
+"filterKelas"
+).value;
+
+
+const status =
+document.getElementById(
+"filterStatus"
+).value;
+
+
+const cari =
+document.getElementById(
+"cariStatus"
+)
+.value
+.trim()
+.toLowerCase();
+
+
+const tempat =
+document.getElementById(
+"daftarStatus"
+);
+
+
+tempat.innerHTML = "";
+
+
+const hasil =
+dataStatus.filter(
+s => {
+
+if (
+kelas &&
+s.kelas !== kelas
+)
+return false;
+
+
+if (
+cari &&
+!s.nama
+.toLowerCase()
+.includes(cari)
+)
+return false;
+
+
+if (
+status ===
+"PERLU"
+) {
+
+return (
+s.status.toUpperCase() ===
+"BELUM ABSEN"
+||
+s.status.toUpperCase() ===
+"TIDAK HADIR"
+);
+
+}
+
+
+if (
+status &&
+s.status.toLowerCase()
+!== status.toLowerCase()
+)
+return false;
+
+
+return true;
+
+}
+);
+
+
+if (
+hasil.length === 0
+) {
+
+tempat.innerHTML =
+'<div class="card center">Tidak ada siswa pada filter ini.</div>';
+
+return;
+
+}
+
+
+hasil.forEach(
+s => {
+
+const div =
+document.createElement(
+"div"
+);
+
+
+div.className =
+"siswa-status";
+
+
+let badgeClass =
+"badge-lain";
+
+
+const x =
+s.status.toUpperCase();
+
+
+if (
+x === "HADIR"
+)
+badgeClass =
+"badge-hadir";
+
+
+else if (
+x === "TERLAMBAT"
+)
+badgeClass =
+"badge-terlambat";
+
+
+else if (
+x === "BELUM ABSEN"
+||
+x === "TIDAK HADIR"
+||
+x === "ALPA"
+)
+badgeClass =
+"badge-absen";
+
+
+div.innerHTML =
+
+'<div class="siswa-top">' +
+
+'<div class="siswa-info">' +
+
+'<b>' +
+s.nama +
+'</b>' +
+
+'<small>' +
+s.kelas +
+' • ' +
+s.id +
+'</small>' +
+
+'</div>' +
+
+'<span class="badge ' +
+badgeClass +
+'">' +
+s.status +
+'</span>' +
+
+'</div>';
+
+
+const tombol =
+document.createElement(
+"button"
+);
+
+
+tombol.className =
+"secondary btn-kecil";
+
+
+tombol.textContent =
+"✏️ Ubah Status";
+
+
+tombol.onclick =
+() =>
+pilihUbahStatus(
+s
+);
+
+
+div.appendChild(
+tombol
+);
+
+
+tempat.appendChild(
+div
+);
+
+}
+);
+
+}
+
+
+document.getElementById(
+"filterKelas"
+).onchange =
+renderStatus;
+
+
+document.getElementById(
+"filterStatus"
+).onchange =
+renderStatus;
+
+
+document.getElementById(
+"cariStatus"
+).oninput =
+renderStatus;
+
+
+document.getElementById(
+"refreshStatus"
+).onclick =
+loadStatus;
+
+
+/* ===============================
+   UBAH STATUS
+================================ */
+
+function pilihUbahStatus(s) {
+
+siswaUbah = s;
+
+
+document.getElementById(
+"panelUbahStatus"
+).style.display =
+"block";
+
+
+document.getElementById(
+"namaUbah"
+).textContent =
+s.nama;
+
+
+document.getElementById(
+"infoUbah"
+).textContent =
+"Kelas " +
+s.kelas +
+" • Status sekarang: " +
+s.status;
+
+
+const select =
+document.getElementById(
+"statusBaru"
+);
+
+
+/*
+ * Reset pilihan.
+ */
+
+select.innerHTML =
+
+'<option value="SAKIT">Sakit</option>' +
+
+'<option value="IZIN">Izin</option>' +
+
+'<option value="ALPA">Alpa</option>' +
+
+'<option value="TERLAMBAT">Terlambat</option>';
+
+
+/*
+ * HAID:
+ * hanya perempuan
+ * dan kegiatan salat.
+ */
+
+const keg =
+kegiatanAktif
+.toLowerCase();
+
+
+const salat =
+keg.includes(
+"dhuha"
+)
+||
+keg.includes(
+"dzuhur"
+)
+||
+keg.includes(
+"zuhur"
+);
+
+
+if (
+String(
+s.jk
+).toUpperCase() ===
+"P"
+&&
+salat
+) {
+
+const option =
+document.createElement(
+"option"
+);
+
+option.value =
+"HAID";
+
+option.textContent =
+"Haid";
+
+select.appendChild(
+option
+);
+
+}
+
+
+document.getElementById(
+"catatanStatus"
+).value =
+"";
+
+
+document.getElementById(
+"panelUbahStatus"
+).scrollIntoView({
+behavior:"smooth",
+block:"start"
+});
+
+}
+
+
+document.getElementById(
+"batalStatus"
+).onclick =
+function() {
+
+siswaUbah = null;
+
+
+document.getElementById(
+"panelUbahStatus"
+).style.display =
+"none";
+
+};
+
+
+document.getElementById(
+"simpanStatus"
+).onclick =
+async function() {
+
+if (
+!siswaUbah
+) return;
+
+
+const statusBaru =
+document.getElementById(
+"statusBaru"
+).value;
+
+
+const catatan =
+document.getElementById(
+"catatanStatus"
+).value.trim();
+
+
+this.disabled = true;
+
+this.textContent =
+"MENYIMPAN...";
+
+
+const d =
+await post({
+
+action:
+"ubahStatus",
+
+idSiswa:
+siswaUbah.id,
+
+kegiatan:
+kegiatanAktif,
+
+statusBaru:
+statusBaru,
+
+catatan:
+catatan,
+
+token:
+token
+
+});
+
+
+this.disabled = false;
+
+this.textContent =
+"✅ SIMPAN PERUBAHAN";
+
+
+if (
+cekLoginHabis(d)
+) return;
+
+
+if (
+!d.berhasil
+) {
+
+alert(
+d.pesan
+);
+
+return;
+
+}
+
+
+alert(
+"Status " +
+d.nama +
+" berhasil diubah dari " +
+d.statusLama +
+" menjadi " +
+d.statusBaru +
+"."
+);
+
+
+document.getElementById(
+"panelUbahStatus"
+).style.display =
+"none";
+
+
+siswaUbah = null;
+
+
+await loadStatus();
+
+};
 
 </script>
 
