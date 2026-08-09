@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Absensi Kegiatan Pagi</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7f5;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+    }
+
+    h1 {
+      color: #1b5e20;
+      margin-bottom: 5px;
+    }
+
+    h2 {
+      font-size: 18px;
+      color: #555;
+      margin-top: 0;
+    }
+
+    video {
+      width: 100%;
+      margin-top: 20px;
+      border-radius: 15px;
+      background: black;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 10px;
+      background: #1b5e20;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #status {
+      margin-top: 15px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>SMP ISLAM CIPAKU</h1>
+    <h2>ABSENSI KEGIATAN PAGI</h2>
+
+    <video id="camera" autoplay playsinline muted></video>
+
+    <button onclick="mulaiKamera()">
+      📷 BUKA KAMERA
+    </button>
+
+    <p id="status">
+      Kamera belum dinyalakan.
+    </p>
+
+  </div>
+
+  <script>
+
+    async function mulaiKamera() {
+
+      const video = document.getElementById("camera");
+      const status = document.getElementById("status");
+
+      status.innerText = "Membuka kamera...";
+
+      try {
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: {
+              ideal: "environment"
+            }
+          },
+          audio: false
+        });
+
+        video.srcObject = stream;
+
+        status.innerText = "✅ Kamera berhasil dibuka.";
+
+      } catch (error) {
+
+        console.error(error);
+
+        status.innerText =
+          "❌ Kamera tidak dapat dibuka. Pastikan izin kamera diberikan.";
+
+      }
+
+    }
+
+  </script>
+
+</body>
+</html>
