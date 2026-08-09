@@ -166,6 +166,10 @@ label {
   margin: 0;
 }
 
+.menu .wide {
+  grid-column: 1 / 3;
+}
+
 /* CAMERA */
 .camera-box {
   overflow: hidden;
@@ -390,6 +394,10 @@ video {
 
       <button id="menuRekap" class="secondary">
         📊 REKAP & EXPORT
+      </button>
+
+      <button id="menuAdmin" class="secondary wide">
+        ⚙️ ADMIN / DATA SISWA
       </button>
     </div>
 
@@ -859,6 +867,19 @@ function() {
 
   window.location.href =
     "./rekap.html";
+};
+
+/* ADMIN DATA SISWA */
+document.getElementById("menuAdmin").onclick =
+function() {
+
+  if (scannerAktif) {
+    scannerAktif = false;
+    scanner.stop();
+  }
+
+  window.location.href =
+    "./admin.html";
 };
 
 
