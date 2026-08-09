@@ -20,40 +20,126 @@
     }
 
     .container {
-      max-width: 500px;
+      max-width: 520px;
       margin: auto;
     }
 
     .header {
       text-align: center;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
 
     h1 {
       color: #1b5e20;
-      margin: 0 0 4px;
+      margin: 0 0 5px;
       font-size: 25px;
     }
 
     h2 {
-      font-size: 17px;
-      color: #555;
       margin: 0;
+      color: #555;
+      font-size: 17px;
     }
 
     .tanggal {
       margin-top: 10px;
+      color: #777;
       font-size: 14px;
-      color: #666;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+    }
+
+    .login-title {
+      text-align: center;
+      color: #1b5e20;
+      margin: 0 0 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      margin-top: 14px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    select,
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 17px;
+      background: white;
+    }
+
+    input {
+      letter-spacing: 5px;
+      text-align: center;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      margin-top: 16px;
+      border: none;
+      border-radius: 11px;
+      background: #1b5e20;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button.stop {
+      background: #b71c1c;
+    }
+
+    button.logout {
+      width: auto;
+      padding: 8px 14px;
+      margin: 0;
+      background: #eeeeee;
+      color: #555;
+      font-size: 13px;
+    }
+
+    .error-text {
+      color: #b71c1c;
+      text-align: center;
+      margin-top: 12px;
+    }
+
+    .petugas-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding: 13px 15px;
+      border-radius: 12px;
+      background: #e8f5e9;
+    }
+
+    .petugas-nama {
+      color: #1b5e20;
+      font-weight: bold;
+      margin-top: 3px;
+    }
+
+    .kecil {
+      font-size: 12px;
+      color: #777;
     }
 
     .jadwal-box {
-      background: white;
-      border-radius: 15px;
-      padding: 17px;
-      margin-bottom: 16px;
       text-align: center;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.07);
     }
 
     .jadwal-label {
@@ -63,9 +149,9 @@
     }
 
     .kegiatan {
-      font-size: 24px;
-      font-weight: bold;
       color: #1b5e20;
+      font-size: 25px;
+      font-weight: bold;
       margin-bottom: 7px;
     }
 
@@ -97,52 +183,51 @@
       color: #555;
     }
 
+    .counter {
+      text-align: center;
+      padding: 12px;
+      background: white;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      color: #555;
+    }
+
+    .counter strong {
+      display: inline-block;
+      color: #1b5e20;
+      font-size: 21px;
+      margin-left: 4px;
+    }
+
     .camera-box {
       position: relative;
       overflow: hidden;
       border-radius: 15px;
-      background: #000;
+      background: black;
     }
 
     video {
-      width: 100%;
       display: block;
+      width: 100%;
       min-height: 290px;
       object-fit: cover;
     }
 
-    button {
-      width: 100%;
-      padding: 16px;
-      margin-top: 16px;
-      border: none;
-      border-radius: 10px;
-      background: #1b5e20;
-      color: white;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button.stop {
-      background: #b71c1c;
-    }
-
-    #status {
-      text-align: center;
-      margin-top: 12px;
-      font-size: 16px;
-      line-height: 1.5;
+    #statusScanner {
       min-height: 24px;
+      text-align: center;
+      margin: 12px 0 0;
+      line-height: 1.5;
     }
 
     .hasil {
-      margin-top: 16px;
-      padding: 20px;
-      background: white;
-      border-radius: 15px;
       display: none;
       text-align: center;
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 16px;
       box-shadow: 0 3px 12px rgba(0,0,0,0.08);
     }
 
@@ -151,55 +236,49 @@
       font-size: 21px;
     }
 
-    .kode-qr {
+    .kode {
       font-size: 13px;
       color: #777;
       margin-bottom: 10px;
     }
 
-    .nama {
+    .nama-siswa {
       font-size: 23px;
       font-weight: bold;
       margin-bottom: 7px;
     }
 
-    .kelas {
+    .kelas-siswa {
       font-size: 18px;
       color: #555;
       margin-bottom: 8px;
     }
 
     .detail {
-      font-size: 15px;
       color: #555;
       line-height: 1.6;
+      font-size: 15px;
     }
 
     .sukses {
       color: #1b5e20;
     }
 
-    .error {
-      color: #b71c1c;
-    }
-
     .peringatan {
       color: #e65100;
     }
 
-    .counter {
-      text-align: center;
-      background: white;
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 16px;
-      font-size: 14px;
-      color: #555;
+    .gagal {
+      color: #b71c1c;
     }
 
-    .counter strong {
-      color: #1b5e20;
-      font-size: 20px;
+    #halamanAplikasi {
+      display: none;
+    }
+
+    #loadingGuru {
+      text-align: center;
+      color: #777;
     }
   </style>
 </head>
@@ -212,63 +291,174 @@
     <h1>SMP ISLAM CIPAKU</h1>
     <h2>ABSENSI KEGIATAN PAGI</h2>
 
-    <div class="tanggal" id="tanggalHariIni">
-      Memuat tanggal...
-    </div>
+    <div class="tanggal" id="tanggalHariIni"></div>
   </div>
 
 
-  <div class="jadwal-box">
+  <!-- ===============================
+       HALAMAN LOGIN
+  ================================ -->
 
-    <div class="jadwal-label">
-      KEGIATAN SAAT INI
-    </div>
+  <div id="halamanLogin">
 
-    <div class="kegiatan" id="namaKegiatan">
-      Memuat...
-    </div>
+    <div class="card">
 
-    <div class="jam-kegiatan" id="jamKegiatan"></div>
+      <h3 class="login-title">
+        LOGIN PETUGAS
+      </h3>
 
-    <div class="status-waktu tidak-ada" id="statusWaktu">
-      Memuat jadwal...
+      <div id="loadingGuru">
+        Memuat daftar guru...
+      </div>
+
+      <div id="formLogin" style="display:none;">
+
+        <label>
+          Nama Guru
+        </label>
+
+        <select id="pilihGuru">
+          <option value="">
+            -- Pilih nama guru --
+          </option>
+        </select>
+
+
+        <label>
+          PIN
+        </label>
+
+        <input
+          id="inputPin"
+          type="password"
+          inputmode="numeric"
+          maxlength="4"
+          placeholder="••••"
+        >
+
+
+        <button id="tombolLogin">
+          MASUK
+        </button>
+
+        <div
+          class="error-text"
+          id="pesanLogin"
+        ></div>
+
+      </div>
+
     </div>
 
   </div>
 
 
-  <div class="counter">
-    Berhasil discan pada sesi ini:
-    <strong id="jumlahScan">0</strong>
-  </div>
+  <!-- ===============================
+       APLIKASI
+  ================================ -->
+
+  <div id="halamanAplikasi">
+
+    <div class="petugas-box">
+
+      <div>
+        <div class="kecil">
+          PETUGAS
+        </div>
+
+        <div
+          class="petugas-nama"
+          id="namaPetugas"
+        ></div>
+      </div>
+
+      <button
+        class="logout"
+        id="tombolLogout"
+      >
+        Keluar
+      </button>
+
+    </div>
 
 
-  <div class="camera-box">
-    <video id="qr-video"></video>
-  </div>
+    <div class="card jadwal-box">
+
+      <div class="jadwal-label">
+        KEGIATAN SAAT INI
+      </div>
+
+      <div
+        class="kegiatan"
+        id="namaKegiatan"
+      >
+        Memuat...
+      </div>
+
+      <div
+        class="jam-kegiatan"
+        id="jamKegiatan"
+      ></div>
+
+      <div
+        class="status-waktu tidak-ada"
+        id="statusWaktu"
+      >
+        Memuat jadwal...
+      </div>
+
+    </div>
 
 
-  <button id="tombolScan">
-    📷 MULAI SCAN
-  </button>
+    <div class="counter">
+      Berhasil discan pada sesi ini:
+      <strong id="jumlahScan">0</strong>
+    </div>
 
 
-  <p id="status">
-    Kamera belum dinyalakan.
-  </p>
+    <div class="camera-box">
+      <video id="qr-video"></video>
+    </div>
 
 
-  <div class="hasil" id="kotakHasil">
+    <button id="tombolScan">
+      📷 MULAI SCAN
+    </button>
 
-    <h3 id="judulHasil"></h3>
 
-    <div class="kode-qr" id="kodeQR"></div>
+    <p id="statusScanner">
+      Kamera belum dinyalakan.
+    </p>
 
-    <div class="nama" id="namaSiswa"></div>
 
-    <div class="kelas" id="kelasSiswa"></div>
+    <div
+      class="hasil"
+      id="kotakHasil"
+    >
 
-    <div class="detail" id="detailPresensi"></div>
+      <h3 id="judulHasil"></h3>
+
+      <div
+        class="kode"
+        id="kodeQR"
+      ></div>
+
+      <div
+        class="nama-siswa"
+        id="namaSiswa"
+      ></div>
+
+      <div
+        class="kelas-siswa"
+        id="kelasSiswa"
+      ></div>
+
+      <div
+        class="detail"
+        id="detailPresensi"
+      ></div>
+
+    </div>
 
   </div>
 
@@ -281,9 +471,47 @@ import QrScanner from
 "https://cdn.jsdelivr.net/npm/qr-scanner@1.4.2/qr-scanner.min.js";
 
 
+/* ===============================
+   BACKEND
+================================ */
+
 const API_URL =
 "https://script.google.com/macros/s/AKfycbzMINLAmz6Wd5d5QvdDefkLNtmkECDPOFZg2D1YUhjS5uQKDys2gbqjG-0AAIIvyi6h-g/exec";
 
+
+/* ===============================
+   ELEMENT
+================================ */
+
+const halamanLogin =
+  document.getElementById("halamanLogin");
+
+const halamanAplikasi =
+  document.getElementById("halamanAplikasi");
+
+const loadingGuru =
+  document.getElementById("loadingGuru");
+
+const formLogin =
+  document.getElementById("formLogin");
+
+const pilihGuru =
+  document.getElementById("pilihGuru");
+
+const inputPin =
+  document.getElementById("inputPin");
+
+const tombolLogin =
+  document.getElementById("tombolLogin");
+
+const pesanLogin =
+  document.getElementById("pesanLogin");
+
+const namaPetugas =
+  document.getElementById("namaPetugas");
+
+const tombolLogout =
+  document.getElementById("tombolLogout");
 
 const video =
   document.getElementById("qr-video");
@@ -291,8 +519,8 @@ const video =
 const tombolScan =
   document.getElementById("tombolScan");
 
-const status =
-  document.getElementById("status");
+const statusScanner =
+  document.getElementById("statusScanner");
 
 const kotakHasil =
   document.getElementById("kotakHasil");
@@ -316,9 +544,31 @@ const jumlahScan =
   document.getElementById("jumlahScan");
 
 
-let scannerAktif = false;
-let sedangMemproses = false;
+/* ===============================
+   VARIABLE
+================================ */
+
+let tokenLogin =
+  localStorage.getItem(
+    "absensi_token"
+  ) || "";
+
+let guruLogin =
+  localStorage.getItem(
+    "absensi_guru"
+  ) || "";
+
+let idGuruLogin =
+  localStorage.getItem(
+    "absensi_id_guru"
+  ) || "";
+
 let kegiatanAktif = "";
+
+let scannerAktif = false;
+
+let sedangMemproses = false;
+
 let totalBerhasil = 0;
 
 
@@ -328,20 +578,369 @@ let totalBerhasil = 0;
 
 function tampilkanTanggal() {
 
-  const sekarang = new Date();
+  document
+    .getElementById(
+      "tanggalHariIni"
+    )
+    .textContent =
+      new Date()
+        .toLocaleDateString(
+          "id-ID",
+          {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+          }
+        );
 
-  document.getElementById(
-    "tanggalHariIni"
-  ).textContent =
-    sekarang.toLocaleDateString(
-      "id-ID",
-      {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric"
+}
+
+
+/* ===============================
+   LOAD GURU
+================================ */
+
+async function muatGuru() {
+
+  try {
+
+    const response =
+      await fetch(
+        API_URL +
+        "?action=daftarGuru"
+      );
+
+    const data =
+      await response.json();
+
+
+    pilihGuru.innerHTML =
+      '<option value="">-- Pilih nama guru --</option>';
+
+
+    if (
+      !data.berhasil ||
+      !Array.isArray(data.data)
+    ) {
+
+      throw new Error(
+        "Daftar guru tidak tersedia."
+      );
+
+    }
+
+
+    data.data.forEach(
+      function(guru) {
+
+        const option =
+          document.createElement(
+            "option"
+          );
+
+        option.value =
+          guru.id;
+
+        option.textContent =
+          guru.nama;
+
+        pilihGuru.appendChild(
+          option
+        );
+
       }
     );
+
+
+    loadingGuru.style.display =
+      "none";
+
+    formLogin.style.display =
+      "block";
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    loadingGuru.textContent =
+      "❌ Gagal memuat daftar guru.";
+
+  }
+
+}
+
+
+/* ===============================
+   LOGIN
+================================ */
+
+tombolLogin.addEventListener(
+  "click",
+
+  async function() {
+
+    const idGuru =
+      pilihGuru.value;
+
+    const pin =
+      inputPin.value.trim();
+
+
+    if (!idGuru) {
+
+      pesanLogin.textContent =
+        "Silakan pilih nama guru.";
+
+      return;
+
+    }
+
+
+    if (!pin) {
+
+      pesanLogin.textContent =
+        "Silakan masukkan PIN.";
+
+      return;
+
+    }
+
+
+    tombolLogin.disabled =
+      true;
+
+    tombolLogin.textContent =
+      "MEMERIKSA...";
+
+    pesanLogin.textContent =
+      "";
+
+
+    try {
+
+      const response =
+        await fetch(
+          API_URL,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "text/plain;charset=UTF-8"
+            },
+
+            body:
+              JSON.stringify({
+                action:
+                  "loginGuru",
+
+                idGuru:
+                  idGuru,
+
+                pin:
+                  pin
+              })
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!data.berhasil) {
+
+        pesanLogin.textContent =
+          data.pesan ||
+          "Login gagal.";
+
+        return;
+
+      }
+
+
+      tokenLogin =
+        data.token;
+
+      guruLogin =
+        data.guru.nama;
+
+      idGuruLogin =
+        data.guru.id;
+
+
+      localStorage.setItem(
+        "absensi_token",
+        tokenLogin
+      );
+
+      localStorage.setItem(
+        "absensi_guru",
+        guruLogin
+      );
+
+      localStorage.setItem(
+        "absensi_id_guru",
+        idGuruLogin
+      );
+
+
+      inputPin.value = "";
+
+
+      bukaAplikasi();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      pesanLogin.textContent =
+        "Tidak dapat terhubung ke server.";
+
+    } finally {
+
+      tombolLogin.disabled =
+        false;
+
+      tombolLogin.textContent =
+        "MASUK";
+
+    }
+
+  }
+);
+
+
+/* ENTER PADA PIN = LOGIN */
+
+inputPin.addEventListener(
+  "keydown",
+
+  function(event) {
+
+    if (
+      event.key === "Enter"
+    ) {
+
+      tombolLogin.click();
+
+    }
+
+  }
+);
+
+
+/* ===============================
+   TAMPILKAN APLIKASI
+================================ */
+
+function bukaAplikasi() {
+
+  halamanLogin.style.display =
+    "none";
+
+  halamanAplikasi.style.display =
+    "block";
+
+
+  namaPetugas.textContent =
+    guruLogin;
+
+
+  ambilKegiatanSekarang();
+
+}
+
+
+/* ===============================
+   LOGOUT
+================================ */
+
+tombolLogout.addEventListener(
+  "click",
+
+  async function() {
+
+    scannerAktif = false;
+
+    sedangMemproses = false;
+
+    scanner.stop();
+
+
+    try {
+
+      if (tokenLogin) {
+
+        await fetch(
+          API_URL,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "text/plain;charset=UTF-8"
+            },
+
+            body:
+              JSON.stringify({
+                action:
+                  "logoutGuru",
+
+                token:
+                  tokenLogin
+              })
+          }
+        );
+
+      }
+
+    } catch (error) {
+
+      console.error(error);
+
+    }
+
+
+    hapusLogin();
+
+  }
+);
+
+
+function hapusLogin() {
+
+  tokenLogin = "";
+  guruLogin = "";
+  idGuruLogin = "";
+
+  localStorage.removeItem(
+    "absensi_token"
+  );
+
+  localStorage.removeItem(
+    "absensi_guru"
+  );
+
+  localStorage.removeItem(
+    "absensi_id_guru"
+  );
+
+
+  halamanAplikasi.style.display =
+    "none";
+
+  halamanLogin.style.display =
+    "block";
+
+
+  pilihGuru.value = "";
+  inputPin.value = "";
+
+  pesanLogin.textContent = "";
 
 }
 
@@ -353,13 +952,19 @@ function tampilkanTanggal() {
 async function ambilKegiatanSekarang() {
 
   const namaKegiatan =
-    document.getElementById("namaKegiatan");
+    document.getElementById(
+      "namaKegiatan"
+    );
 
   const jamKegiatan =
-    document.getElementById("jamKegiatan");
+    document.getElementById(
+      "jamKegiatan"
+    );
 
   const statusWaktu =
-    document.getElementById("statusWaktu");
+    document.getElementById(
+      "statusWaktu"
+    );
 
 
   try {
@@ -415,6 +1020,7 @@ async function ambilKegiatanSekarang() {
 
       }
 
+
       return;
 
     }
@@ -427,7 +1033,8 @@ async function ambilKegiatanSekarang() {
       "Tidak Ada Kegiatan";
 
 
-    jamKegiatan.textContent = "";
+    jamKegiatan.textContent =
+      "";
 
 
     statusWaktu.textContent =
@@ -443,15 +1050,21 @@ async function ambilKegiatanSekarang() {
 
     console.error(error);
 
+
     kegiatanAktif = "";
 
-    namaKegiatan.textContent =
-      "Gagal memuat jadwal";
 
-    jamKegiatan.textContent = "";
+    namaKegiatan.textContent =
+      "Gagal Memuat Jadwal";
+
+
+    jamKegiatan.textContent =
+      "";
+
 
     statusWaktu.textContent =
       "Tidak dapat terhubung ke server.";
+
 
     statusWaktu.className =
       "status-waktu tidak-ada";
@@ -476,11 +1089,14 @@ const scanner =
         sedangMemproses ||
         !scannerAktif
       ) {
+
         return;
+
       }
 
 
-      sedangMemproses = true;
+      sedangMemproses =
+        true;
 
 
       const kode =
@@ -492,28 +1108,31 @@ const scanner =
       await scanner.pause();
 
 
-      status.textContent =
+      statusScanner.textContent =
         "⏳ Memproses presensi...";
 
 
       if (navigator.vibrate) {
+
         navigator.vibrate(80);
+
       }
 
 
-      await prosesPresensi(kode);
+      await prosesPresensi(
+        kode
+      );
 
 
       /*
-       * Tunggu agar guru sempat melihat hasil.
+       * Beri guru waktu melihat hasil.
        */
 
       await tunggu(1500);
 
 
       /*
-       * Jika guru belum menekan STOP,
-       * kamera dilanjutkan otomatis.
+       * Otomatis scan siswa berikutnya.
        */
 
       if (scannerAktif) {
@@ -521,16 +1140,21 @@ const scanner =
         kotakHasil.style.display =
           "none";
 
-        status.textContent =
+
+        statusScanner.textContent =
           "📷 Siap scan siswa berikutnya.";
 
-        sedangMemproses = false;
+
+        sedangMemproses =
+          false;
+
 
         await scanner.start();
 
       } else {
 
-        sedangMemproses = false;
+        sedangMemproses =
+          false;
 
       }
 
@@ -557,16 +1181,122 @@ const scanner =
 
 
 /* ===============================
-   CATAT PRESENSI
+   START / STOP SCANNER
 ================================ */
 
-async function prosesPresensi(idSiswa) {
+tombolScan.addEventListener(
+  "click",
+
+  async function() {
+
+    /*
+     * STOP
+     */
+
+    if (scannerAktif) {
+
+      scannerAktif =
+        false;
+
+      sedangMemproses =
+        false;
+
+
+      scanner.stop();
+
+
+      tombolScan.textContent =
+        "📷 MULAI SCAN";
+
+      tombolScan.className =
+        "";
+
+
+      statusScanner.textContent =
+        "Scanner dihentikan.";
+
+
+      return;
+
+    }
+
+
+    /*
+     * TIDAK ADA KEGIATAN
+     */
+
+    if (!kegiatanAktif) {
+
+      statusScanner.textContent =
+        "❌ Tidak ada kegiatan aktif saat ini.";
+
+      return;
+
+    }
+
+
+    /*
+     * START
+     */
+
+    try {
+
+      kotakHasil.style.display =
+        "none";
+
+
+      statusScanner.textContent =
+        "Membuka kamera...";
+
+
+      await scanner.start();
+
+
+      scannerAktif =
+        true;
+
+      sedangMemproses =
+        false;
+
+
+      tombolScan.textContent =
+        "⏹ SELESAI SCAN";
+
+      tombolScan.className =
+        "stop";
+
+
+      statusScanner.textContent =
+        "📷 Arahkan kamera ke QR siswa.";
+
+
+    } catch (error) {
+
+      console.error(error);
+
+
+      statusScanner.textContent =
+        "❌ Kamera tidak dapat dibuka.";
+
+    }
+
+  }
+);
+
+
+/* ===============================
+   PROSES PRESENSI
+================================ */
+
+async function prosesPresensi(
+  idSiswa
+) {
 
   try {
 
     if (!kegiatanAktif) {
 
-      tampilkanError(
+      tampilkanGagal(
         idSiswa,
         "Tidak ada kegiatan aktif."
       );
@@ -576,29 +1306,11 @@ async function prosesPresensi(idSiswa) {
     }
 
 
-    const dataKirim = {
-
-      action:
-        "catatPresensi",
-
-      idSiswa:
-        idSiswa,
-
-      kegiatan:
-        kegiatanAktif,
-
-      petugas:
-        "TEST HP"
-
-    };
-
-
     const response =
       await fetch(
         API_URL,
         {
-          method:
-            "POST",
+          method: "POST",
 
           headers: {
             "Content-Type":
@@ -606,9 +1318,21 @@ async function prosesPresensi(idSiswa) {
           },
 
           body:
-            JSON.stringify(
-              dataKirim
-            )
+            JSON.stringify({
+
+              action:
+                "catatPresensi",
+
+              idSiswa:
+                idSiswa,
+
+              kegiatan:
+                kegiatanAktif,
+
+              token:
+                tokenLogin
+
+            })
         }
       );
 
@@ -618,12 +1342,37 @@ async function prosesPresensi(idSiswa) {
 
 
     /*
+     * SESSION HABIS
+     */
+
+    if (data.harusLogin) {
+
+      scannerAktif =
+        false;
+
+      scanner.stop();
+
+
+      alert(
+        "Sesi login telah habis. Silakan login kembali."
+      );
+
+
+      hapusLogin();
+
+      return;
+
+    }
+
+
+    /*
      * BERHASIL
      */
 
     if (data.berhasil) {
 
       totalBerhasil++;
+
 
       jumlahScan.textContent =
         totalBerhasil;
@@ -652,11 +1401,13 @@ async function prosesPresensi(idSiswa) {
 
       kelasSiswa.textContent =
         data.kelas
-          ? "Kelas " + data.kelas
+          ? "Kelas " +
+            data.kelas
           : "";
 
 
       detailPresensi.innerHTML =
+
         "Kegiatan: <b>" +
         data.kegiatan +
         "</b><br>" +
@@ -667,10 +1418,14 @@ async function prosesPresensi(idSiswa) {
 
         "Jam: <b>" +
         data.jam +
+        "</b><br>" +
+
+        "Petugas: <b>" +
+        data.petugas +
         "</b>";
 
 
-      status.textContent =
+      statusScanner.textContent =
         "✅ Presensi berhasil disimpan.";
 
 
@@ -684,6 +1439,7 @@ async function prosesPresensi(idSiswa) {
 
 
       bunyiBerhasil();
+
 
       return;
 
@@ -719,21 +1475,26 @@ async function prosesPresensi(idSiswa) {
 
       kelasSiswa.textContent =
         data.kelas
-          ? "Kelas " + data.kelas
+          ? "Kelas " +
+            data.kelas
           : "";
 
 
       detailPresensi.innerHTML =
+
         "Kegiatan: <b>" +
         kegiatanAktif +
         "</b><br>" +
 
         "Sudah tercatat pukul: <b>" +
-        (data.jamSebelumnya || "-") +
+        (
+          data.jamSebelumnya ||
+          "-"
+        ) +
         "</b>";
 
 
-      status.textContent =
+      statusScanner.textContent =
         "⚠️ Siswa sudah melakukan presensi.";
 
 
@@ -748,12 +1509,17 @@ async function prosesPresensi(idSiswa) {
 
       bunyiPeringatan();
 
+
       return;
 
     }
 
 
-    tampilkanError(
+    /*
+     * ERROR BIASA
+     */
+
+    tampilkanGagal(
       idSiswa,
       data.pesan ||
       "Presensi gagal."
@@ -765,7 +1531,7 @@ async function prosesPresensi(idSiswa) {
     console.error(error);
 
 
-    tampilkanError(
+    tampilkanGagal(
       idSiswa,
       "Tidak dapat terhubung ke server."
     );
@@ -779,7 +1545,7 @@ async function prosesPresensi(idSiswa) {
    ERROR
 ================================ */
 
-function tampilkanError(
+function tampilkanGagal(
   idSiswa,
   pesan
 ) {
@@ -793,7 +1559,7 @@ function tampilkanError(
 
 
   judulHasil.className =
-    "error";
+    "gagal";
 
 
   kodeQR.textContent =
@@ -801,15 +1567,19 @@ function tampilkanError(
     idSiswa;
 
 
-  namaSiswa.textContent = "";
-  kelasSiswa.textContent = "";
+  namaSiswa.textContent =
+    "";
+
+
+  kelasSiswa.textContent =
+    "";
 
 
   detailPresensi.textContent =
     pesan;
 
 
-  status.textContent =
+  statusScanner.textContent =
     pesan;
 
 
@@ -825,104 +1595,7 @@ function tampilkanError(
 
 
 /* ===============================
-   TOMBOL START / STOP
-================================ */
-
-tombolScan.addEventListener(
-  "click",
-
-  async function () {
-
-    /*
-     * STOP
-     */
-
-    if (scannerAktif) {
-
-      scannerAktif = false;
-
-      sedangMemproses = false;
-
-
-      scanner.stop();
-
-
-      tombolScan.textContent =
-        "📷 MULAI SCAN";
-
-
-      tombolScan.className = "";
-
-
-      status.textContent =
-        "Scanner dihentikan.";
-
-
-      return;
-
-    }
-
-
-    /*
-     * START
-     */
-
-    if (!kegiatanAktif) {
-
-      status.textContent =
-        "❌ Tidak ada kegiatan aktif saat ini.";
-
-      return;
-
-    }
-
-
-    try {
-
-      kotakHasil.style.display =
-        "none";
-
-
-      status.textContent =
-        "Membuka kamera...";
-
-
-      await scanner.start();
-
-
-      scannerAktif = true;
-      sedangMemproses = false;
-
-
-      tombolScan.textContent =
-        "⏹ SELESAI SCAN";
-
-
-      tombolScan.className =
-        "stop";
-
-
-      status.textContent =
-        "📷 Arahkan kamera ke QR siswa.";
-
-
-    } catch (error) {
-
-      console.error(error);
-
-
-      status.textContent =
-        "❌ Kamera tidak dapat dibuka.";
-
-    }
-
-  }
-
-);
-
-
-/* ===============================
-   TUNGGU
+   DELAY
 ================================ */
 
 function tunggu(ms) {
@@ -939,7 +1612,7 @@ function tunggu(ms) {
 
 
 /* ===============================
-   BUNYI
+   SUARA
 ================================ */
 
 function bunyiBerhasil() {
@@ -954,14 +1627,17 @@ function bunyiBerhasil() {
 
 
     const oscillator =
-      audioContext.createOscillator();
+      audioContext
+        .createOscillator();
 
 
     const gain =
-      audioContext.createGain();
+      audioContext
+        .createGain();
 
 
     oscillator.connect(gain);
+
     gain.connect(
       audioContext.destination
     );
@@ -979,16 +1655,18 @@ function bunyiBerhasil() {
 
 
     setTimeout(
-      () => {
+      function() {
 
         oscillator.stop();
+
         audioContext.close();
 
       },
       120
     );
 
-  } catch (e) {}
+
+  } catch (error) {}
 
 }
 
@@ -1005,11 +1683,13 @@ function bunyiPeringatan() {
 
 
     const oscillator =
-      audioContext.createOscillator();
+      audioContext
+        .createOscillator();
 
 
     const gain =
-      audioContext.createGain();
+      audioContext
+        .createGain();
 
 
     oscillator.connect(gain);
@@ -1031,26 +1711,44 @@ function bunyiPeringatan() {
 
 
     setTimeout(
-      () => {
+      function() {
 
         oscillator.stop();
+
         audioContext.close();
 
       },
       220
     );
 
-  } catch (e) {}
+
+  } catch (error) {}
 
 }
 
 
 /* ===============================
-   MULAI HALAMAN
+   SAAT HALAMAN DIBUKA
 ================================ */
 
 tampilkanTanggal();
-ambilKegiatanSekarang();
+
+muatGuru();
+
+
+/*
+ * Kalau HP ini sebelumnya sudah login,
+ * langsung buka halaman scanner.
+ */
+
+if (
+  tokenLogin &&
+  guruLogin
+) {
+
+  bukaAplikasi();
+
+}
 
 </script>
 
