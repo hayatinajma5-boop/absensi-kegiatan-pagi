@@ -84,6 +84,16 @@ button.logout {
   font-size: 13px;
 }
 
+button.haid-action {
+  background: #ad1457;
+  color: white;
+}
+
+button.haid-action:disabled {
+  opacity: .6;
+  cursor: default;
+}
+
 select,
 input,
 textarea {
@@ -692,6 +702,15 @@ video {
           id="catatanStatus"
           placeholder="Opsional, misalnya: surat dari orang tua"
         ></textarea>
+
+        <button
+          id="mulaiHaid"
+          class="haid-action"
+          type="button"
+          style="display:none;"
+        >
+          🌸 MULAI HAID
+        </button>
 
         <button id="simpanStatus">✅ SIMPAN PERUBAHAN</button>
 
@@ -1974,6 +1993,14 @@ function pilihUbahStatus(s) {
       .toUpperCase()
       === "P";
 
+  const sedangHaid =
+    String(
+      s.status
+    )
+      .trim()
+      .toUpperCase()
+      === "HAID";
+
   let info =
     "Kelas " +
     s.kelas +
@@ -1983,16 +2010,11 @@ function pilihUbahStatus(s) {
   if (
     salat &&
     perempuan &&
-    String(
-      s.status
-    )
-      .trim()
-      .toUpperCase()
-      === "HAID"
+    sedangHaid
   ) {
 
     info +=
-      " • Pilih Hadir saat sudah kembali sholat";
+      " • Saat sudah kembali sholat, cukup scan QR seperti biasa";
 
   }
 
@@ -2008,6 +2030,10 @@ function pilihUbahStatus(s) {
     '<option value="IZIN">Izin</option>' +
     '<option value="ALPA">Alpa</option>' +
     '<option value="TERLAMBAT">Terlambat</option>';
+
+  /*
+   * Haid manual tetap tersedia sebagai cadangan.
+   */
 
   if (
     perempuan &&
@@ -2029,6 +2055,33 @@ function pilihUbahStatus(s) {
 
   }
 
+
+  /*
+   * Tombol cepat hanya tampil untuk siswi pada Dhuha/Dzuhur
+   * yang belum sedang berstatus Haid.
+   */
+
+  const tombolMulai =
+    document.getElementById(
+      "mulaiHaid"
+    );
+
+  tombolMulai.style.display =
+    (
+      perempuan &&
+      salat &&
+      !sedangHaid
+    )
+      ? "block"
+      : "none";
+
+  tombolMulai.disabled =
+    false;
+
+  tombolMulai.textContent =
+    "🌸 MULAI HAID";
+
+
   document.getElementById("catatanStatus").value =
     "";
 
@@ -2037,6 +2090,89 @@ function pilihUbahStatus(s) {
     block: "start"
   });
 }
+
+
+document.getElementById("mulaiHaid").onclick =
+async function() {
+
+  if (!siswaUbah) return;
+
+  const siswaSaatIni =
+    siswaUbah;
+
+  this.disabled =
+    true;
+
+  this.textContent =
+    "MENYIMPAN...";
+
+
+  const d =
+    await post({
+      action:
+        "mulaiStatusHaid",
+      idSiswa:
+        siswaSaatIni.id,
+      kegiatan:
+        kegiatanAktif,
+      token:
+        token
+    });
+
+
+  this.disabled =
+    false;
+
+  this.textContent =
+    "🌸 MULAI HAID";
+
+
+  if (
+    cekLoginHabis(
+      d
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  if (
+    !d.berhasil
+  ) {
+
+    alert(
+      d.pesan ||
+      "Gagal memulai status Haid."
+    );
+
+    return;
+
+  }
+
+
+  alert(
+    d.pesan ||
+    (
+      "Status Haid " +
+      d.nama +
+      " berhasil dimulai."
+    )
+  );
+
+
+  document.getElementById("panelUbahStatus").style.display =
+    "none";
+
+  siswaUbah =
+    null;
+
+
+  await loadStatus();
+
+};
+
 
 document.getElementById("batalStatus").onclick =
 function() {
