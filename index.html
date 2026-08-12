@@ -679,6 +679,7 @@ video {
         <label>Status Baru</label>
 
         <select id="statusBaru">
+          <option value="HADIR">Hadir</option>
           <option value="SAKIT">Sakit</option>
           <option value="IZIN">Izin</option>
           <option value="ALPA">Alpa</option>
@@ -1955,21 +1956,6 @@ function pilihUbahStatus(s) {
   document.getElementById("namaUbah").textContent =
     s.nama;
 
-  document.getElementById("infoUbah").textContent =
-    "Kelas " +
-    s.kelas +
-    " • Status sekarang: " +
-    s.status;
-
-  const select =
-    document.getElementById("statusBaru");
-
-  select.innerHTML =
-    '<option value="SAKIT">Sakit</option>' +
-    '<option value="IZIN">Izin</option>' +
-    '<option value="ALPA">Alpa</option>' +
-    '<option value="TERLAMBAT">Terlambat</option>';
-
   const keg =
     kegiatanAktif.toLowerCase();
 
@@ -1980,18 +1966,67 @@ function pilihUbahStatus(s) {
     ||
     keg.includes("zuhur");
 
+  const perempuan =
+    String(
+      s.jk
+    )
+      .trim()
+      .toUpperCase()
+      === "P";
+
+  let info =
+    "Kelas " +
+    s.kelas +
+    " • Status sekarang: " +
+    s.status;
+
   if (
-    String(s.jk).toUpperCase() === "P"
-    &&
+    salat &&
+    perempuan &&
+    String(
+      s.status
+    )
+      .trim()
+      .toUpperCase()
+      === "HAID"
+  ) {
+
+    info +=
+      " • Pilih Hadir saat sudah kembali sholat";
+
+  }
+
+  document.getElementById("infoUbah").textContent =
+    info;
+
+  const select =
+    document.getElementById("statusBaru");
+
+  select.innerHTML =
+    '<option value="HADIR">Hadir</option>' +
+    '<option value="SAKIT">Sakit</option>' +
+    '<option value="IZIN">Izin</option>' +
+    '<option value="ALPA">Alpa</option>' +
+    '<option value="TERLAMBAT">Terlambat</option>';
+
+  if (
+    perempuan &&
     salat
   ) {
+
     const option =
       document.createElement("option");
 
-    option.value = "HAID";
-    option.textContent = "Haid";
+    option.value =
+      "HAID";
 
-    select.appendChild(option);
+    option.textContent =
+      "Haid";
+
+    select.appendChild(
+      option
+    );
+
   }
 
   document.getElementById("catatanStatus").value =
