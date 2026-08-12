@@ -311,6 +311,82 @@ video {
   display: none;
   border: 2px solid #1b5e20;
 }
+
+
+/* TOAST HASIL SCAN QR */
+#toastQR {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%) translateY(24px);
+  width: calc(100% - 30px);
+  max-width: 510px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  box-shadow: 0 8px 26px rgba(0,0,0,.22);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 9999;
+  transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+}
+
+#toastQR.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+#toastQR.success {
+  background: #e8f5e9;
+  color: #1b5e20;
+  border-left: 6px solid #1b5e20;
+}
+
+#toastQR.warning {
+  background: #fff3e0;
+  color: #e65100;
+  border-left: 6px solid #e65100;
+}
+
+#toastQR.error {
+  background: #ffebee;
+  color: #b71c1c;
+  border-left: 6px solid #b71c1c;
+}
+
+.toast-qr-icon {
+  flex: 0 0 auto;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.toast-qr-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.toast-qr-title {
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1.25;
+}
+
+.toast-qr-message {
+  margin-top: 3px;
+  font-size: 14px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+/* Hasil QR sekarang ditampilkan melalui toast agar kamera tetap lapang. */
+#hasilQR {
+  display: none !important;
+}
+
 </style>
 </head>
 
@@ -588,6 +664,17 @@ video {
 </div>
 
 
+
+
+<!-- POPUP / TOAST HASIL SCAN QR -->
+<div id="toastQR" role="status" aria-live="polite">
+  <div id="toastQRIcon" class="toast-qr-icon">✅</div>
+  <div class="toast-qr-text">
+    <div id="toastQRTitle" class="toast-qr-title">Presensi berhasil</div>
+    <div id="toastQRMessage" class="toast-qr-message"></div>
+  </div>
+</div>
+
 <script type="module">
 
 import QrScanner from
@@ -609,9 +696,10 @@ let totalScan = 0;
 
 // Optimasi scanner QR
 let qrTerakhir = "";
-let waktuScanTerakhir = 0;
-let timerHasilQR = null;
+let timerResetQR = null;
 let audioContext = null;
+let timerToast = null;
+let toastQrAktif = "";
 
 let siswaManual = null;
 let dataStatus = [];
@@ -893,9 +981,13 @@ function() {
 /* QR */
 
 /*
-  Scanner dibuat tetap menyala selama sesi.
-  Jadi setelah satu QR terbaca, kamera tidak di-pause dan tidak di-start ulang.
-  "proses" hanya mencegah request bertumpuk saat satu data sedang dikirim.
+  Scanner tetap menyala selama sesi.
+
+  Perilaku popup:
+  - Popup muncul saat server mengonfirmasi hasil scan.
+  - Selama QR yang sama masih terlihat kamera, popup tetap tampil.
+  - Setelah QR tersebut tidak terlihat lagi, popup menghilang 0,8 detik kemudian.
+  - Jika QR siswa berikutnya terbaca lebih dulu, popup baru langsung menggantikan popup lama.
 */
 const scanner =
 new QrScanner(
@@ -904,28 +996,39 @@ new QrScanner(
 
   async hasil => {
 
-    if (!scannerAktif || proses) return;
+    if (!scannerAktif) return;
 
     const idQR =
       String(hasil.data || "").trim();
 
     if (!idQR) return;
 
-    const sekarang = Date.now();
+    /*
+      Bila popup untuk QR ini sedang tampil, setiap kali kamera
+      masih mendeteksi QR yang sama kita mulai ulang hitungan 0,8 detik.
+      Artinya popup tidak hilang selama QR masih disorot.
+    */
+    if (toastQrAktif === idQR) {
+      jadwalkanToastHilang(idQR);
+    }
 
     /*
-      Mencegah QR siswa yang sama terbaca berkali-kali
-      saat kartu masih berada di depan kamera.
+      QR yang sama tidak dikirim berkali-kali selama masih berada
+      di depan kamera. Timer di-reset setiap kali QR yang sama masih terlihat.
     */
-    if (
-      idQR === qrTerakhir &&
-      sekarang - waktuScanTerakhir < 2500
-    ) {
+    if (idQR === qrTerakhir) {
+      jadwalkanResetQR(idQR);
       return;
     }
 
+    /*
+      Bila request sebelumnya masih diproses, kamera tetap menyala.
+      QR berikutnya akan terbaca lagi ketika request selesai jika masih diarahkan.
+    */
+    if (proses) return;
+
     qrTerakhir = idQR;
-    waktuScanTerakhir = sekarang;
+    jadwalkanResetQR(idQR);
     proses = true;
 
     document.getElementById("statusScanner").textContent =
@@ -941,20 +1044,7 @@ new QrScanner(
         alasan: "-"
       });
 
-    /*
-      Tidak ada scanner.pause(), tidak ada delay 1,5 detik,
-      dan tidak ada scanner.start() ulang.
-      Kamera tetap aktif selama sesi scan.
-    */
-    tampilQR(d);
-
-    if (d && d.berhasil) {
-      bunyiBerhasil();
-
-      if (navigator.vibrate) {
-        navigator.vibrate(100);
-      }
-    }
+    tampilQR(d, idQR);
 
     proses = false;
 
@@ -962,22 +1052,6 @@ new QrScanner(
       document.getElementById("statusScanner").textContent =
         "Siap scan siswa berikutnya.";
     }
-
-    /*
-      Kotak hasil boleh hilang sendiri,
-      tetapi scanner tetap bisa membaca siswa berikutnya.
-    */
-    if (timerHasilQR) {
-      clearTimeout(timerHasilQR);
-    }
-
-    timerHasilQR =
-      setTimeout(() => {
-        if (scannerAktif) {
-          document.getElementById("hasilQR").style.display =
-            "none";
-        }
-      }, 1200);
   },
 
   {
@@ -987,6 +1061,26 @@ new QrScanner(
     returnDetailedScanResult: true
   }
 );
+
+
+/*
+  QR yang sama baru boleh diproses lagi setelah tidak terdeteksi
+  selama 0,8 detik. Selama QR masih terlihat, callback scanner
+  terus memperbarui timer ini.
+*/
+function jadwalkanResetQR(idQR) {
+
+  if (timerResetQR) {
+    clearTimeout(timerResetQR);
+  }
+
+  timerResetQR = setTimeout(() => {
+    if (qrTerakhir === idQR) {
+      qrTerakhir = "";
+    }
+    timerResetQR = null;
+  }, 800);
+}
 
 
 /*
@@ -1061,6 +1155,86 @@ function bunyiBerhasil() {
 }
 
 
+/*
+  Menjadwalkan popup hilang 0,8 detik setelah QR terakhir kali
+  terlihat. Jika QR yang sama masih terlihat, fungsi ini dipanggil
+  lagi dan hitungan 0,8 detik dimulai ulang.
+*/
+function jadwalkanToastHilang(idQR) {
+
+  if (timerToast) {
+    clearTimeout(timerToast);
+  }
+
+  timerToast = setTimeout(() => {
+    if (toastQrAktif === idQR) {
+      sembunyikanToastQR();
+    }
+  }, 800);
+}
+
+
+function tampilToastQR(tipe, judul, pesan, idQR) {
+
+  const toast =
+    document.getElementById("toastQR");
+
+  const icon =
+    document.getElementById("toastQRIcon");
+
+  const title =
+    document.getElementById("toastQRTitle");
+
+  const message =
+    document.getElementById("toastQRMessage");
+
+  const ikon = {
+    success: "✅",
+    warning: "⚠️",
+    error: "❌"
+  };
+
+  if (timerToast) {
+    clearTimeout(timerToast);
+    timerToast = null;
+  }
+
+  toastQrAktif = idQR || "";
+
+  toast.className = tipe;
+  icon.textContent = ikon[tipe] || "ℹ️";
+  title.textContent = judul;
+  message.textContent = pesan || "";
+
+  // Memaksa browser membaca state awal agar animasi tetap muncul
+  // walaupun scan dilakukan berurutan dengan cepat.
+  void toast.offsetWidth;
+  toast.classList.add("show");
+
+  /*
+    Jika QR langsung dipindahkan setelah bunyi, popup tetap terlihat
+    selama 0,8 detik. Jika QR masih terlihat, callback scanner akan
+    terus memperbarui timer ini sehingga popup tetap tampil.
+  */
+  jadwalkanToastHilang(toastQrAktif);
+}
+
+
+function sembunyikanToastQR() {
+
+  const toast =
+    document.getElementById("toastQR");
+
+  if (timerToast) {
+    clearTimeout(timerToast);
+    timerToast = null;
+  }
+
+  toast.classList.remove("show");
+  toastQrAktif = "";
+}
+
+
 document.getElementById("mulaiScan").onclick =
 async function() {
 
@@ -1070,10 +1244,13 @@ async function() {
 
     scanner.stop();
 
-    if (timerHasilQR) {
-      clearTimeout(timerHasilQR);
-      timerHasilQR = null;
+    if (timerResetQR) {
+      clearTimeout(timerResetQR);
+      timerResetQR = null;
     }
+
+    qrTerakhir = "";
+    sembunyikanToastQR();
 
     document.getElementById("hasilQR").style.display =
       "none";
@@ -1105,8 +1282,14 @@ async function() {
     siapkanAudio();
 
     qrTerakhir = "";
-    waktuScanTerakhir = 0;
     proses = false;
+
+    if (timerResetQR) {
+      clearTimeout(timerResetQR);
+      timerResetQR = null;
+    }
+
+    sembunyikanToastQR();
 
     await scanner.start();
 
@@ -1130,65 +1313,57 @@ async function() {
 };
 
 
-function tampilQR(d) {
+function tampilQR(d, idQR) {
 
   if (cekLoginHabis(d)) return;
 
-  const box =
-    document.getElementById("hasilQR");
-
-  box.style.display = "block";
+  // Kotak hasil lama tidak dipakai pada mode popup.
+  document.getElementById("hasilQR").style.display =
+    "none";
 
   if (d.berhasil) {
+
     totalScan++;
 
     document.getElementById("counter").textContent =
       totalScan;
 
-    document.getElementById("judulQR").textContent =
-      "✅ PRESENSI BERHASIL";
+    tampilToastQR(
+      "success",
+      "Presensi berhasil",
+      (d.nama || "Siswa") +
+      " • Kelas " + (d.kelas || "-") +
+      " • " + (d.status || "Tercatat"),
+      idQR
+    );
 
-    document.getElementById("judulQR").className =
-      "sukses";
+    // Popup, beep, dan getar diberikan pada momen yang sama.
+    bunyiBerhasil();
 
-    document.getElementById("namaQR").textContent =
-      d.nama;
-
-    document.getElementById("kelasQR").textContent =
-      "Kelas " + d.kelas;
-
-    document.getElementById("detailQR").innerHTML =
-      "Status: <b>" + d.status + "</b><br>" +
-      "Jam: <b>" + d.jam + "</b><br>" +
-      "Petugas: <b>" + d.petugas + "</b>";
+    if (navigator.vibrate) {
+      navigator.vibrate(100);
+    }
 
   } else if (d.sudahAbsen) {
 
-    document.getElementById("judulQR").textContent =
-      "⚠️ SUDAH ABSEN";
-
-    document.getElementById("judulQR").className =
-      "warning";
-
-    document.getElementById("namaQR").textContent =
-      d.nama;
-
-    document.getElementById("kelasQR").textContent =
-      "Kelas " + d.kelas;
-
-    document.getElementById("detailQR").textContent =
-      "Sudah tercatat pukul " + d.jamSebelumnya;
+    tampilToastQR(
+      "warning",
+      "Sudah absen",
+      (d.nama || "Siswa") +
+      (d.jamSebelumnya
+        ? " • Tercatat pukul " + d.jamSebelumnya
+        : " • Presensi sudah tercatat"),
+      idQR
+    );
 
   } else {
 
-    document.getElementById("judulQR").textContent =
-      "❌ GAGAL";
-
-    document.getElementById("judulQR").className =
-      "error";
-
-    document.getElementById("detailQR").textContent =
-      d.pesan;
+    tampilToastQR(
+      "error",
+      "Presensi gagal",
+      d.pesan || "Data siswa tidak ditemukan.",
+      idQR
+    );
   }
 }
 
