@@ -606,6 +606,13 @@ let kegiatanAktif = "";
 let scannerAktif = false;
 let proses = false;
 let totalScan = 0;
+
+// Optimasi scanner QR
+let qrTerakhir = "";
+let waktuScanTerakhir = 0;
+let timerHasilQR = null;
+let audioContext = null;
+
 let siswaManual = null;
 let dataStatus = [];
 let siswaUbah = null;
@@ -884,6 +891,12 @@ function() {
 
 
 /* QR */
+
+/*
+  Scanner dibuat tetap menyala selama sesi.
+  Jadi setelah satu QR terbaca, kamera tidak di-pause dan tidak di-start ulang.
+  "proses" hanya mencegah request bertumpuk saat satu data sedang dikirim.
+*/
 const scanner =
 new QrScanner(
 
@@ -891,40 +904,80 @@ new QrScanner(
 
   async hasil => {
 
-    if (
-      proses ||
-      !scannerAktif
-    ) return;
+    if (!scannerAktif || proses) return;
 
+    const idQR =
+      String(hasil.data || "").trim();
+
+    if (!idQR) return;
+
+    const sekarang = Date.now();
+
+    /*
+      Mencegah QR siswa yang sama terbaca berkali-kali
+      saat kartu masih berada di depan kamera.
+    */
+    if (
+      idQR === qrTerakhir &&
+      sekarang - waktuScanTerakhir < 2500
+    ) {
+      return;
+    }
+
+    qrTerakhir = idQR;
+    waktuScanTerakhir = sekarang;
     proses = true;
 
-    await scanner.pause();
+    document.getElementById("statusScanner").textContent =
+      "QR terbaca. Menyimpan presensi...";
 
     const d =
       await post({
         action: "catatPresensi",
-        idSiswa: String(hasil.data).trim(),
+        idSiswa: idQR,
         kegiatan: kegiatanAktif,
         token: token,
         metode: "QR",
         alasan: "-"
       });
 
+    /*
+      Tidak ada scanner.pause(), tidak ada delay 1,5 detik,
+      dan tidak ada scanner.start() ulang.
+      Kamera tetap aktif selama sesi scan.
+    */
     tampilQR(d);
 
-    await new Promise(
-      r => setTimeout(r, 1500)
-    );
+    if (d && d.berhasil) {
+      bunyiBerhasil();
+
+      if (navigator.vibrate) {
+        navigator.vibrate(100);
+      }
+    }
+
+    proses = false;
 
     if (scannerAktif) {
-      document.getElementById("hasilQR").style.display =
-        "none";
-
-      proses = false;
-      await scanner.start();
-    } else {
-      proses = false;
+      document.getElementById("statusScanner").textContent =
+        "Siap scan siswa berikutnya.";
     }
+
+    /*
+      Kotak hasil boleh hilang sendiri,
+      tetapi scanner tetap bisa membaca siswa berikutnya.
+    */
+    if (timerHasilQR) {
+      clearTimeout(timerHasilQR);
+    }
+
+    timerHasilQR =
+      setTimeout(() => {
+        if (scannerAktif) {
+          document.getElementById("hasilQR").style.display =
+            "none";
+        }
+      }, 1200);
   },
 
   {
@@ -935,15 +988,105 @@ new QrScanner(
   }
 );
 
+
+/*
+  AudioContext disiapkan dari klik tombol MULAI SCAN.
+  Ini lebih kompatibel dengan browser HP dibanding membuat
+  AudioContext baru setiap kali QR berhasil.
+*/
+function siapkanAudio() {
+
+  const AudioCtx =
+    window.AudioContext ||
+    window.webkitAudioContext;
+
+  if (!AudioCtx) return;
+
+  try {
+    if (!audioContext) {
+      audioContext =
+        new AudioCtx();
+    }
+
+    if (audioContext.state === "suspended") {
+      audioContext.resume().catch(() => {});
+    }
+  } catch {
+    audioContext = null;
+  }
+}
+
+
+function bunyiBerhasil() {
+
+  if (!audioContext) return;
+
+  try {
+    const oscillator =
+      audioContext.createOscillator();
+
+    const gain =
+      audioContext.createGain();
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    const mulai =
+      audioContext.currentTime;
+
+    oscillator.type =
+      "sine";
+
+    oscillator.frequency.setValueAtTime(
+      1150,
+      mulai
+    );
+
+    gain.gain.setValueAtTime(
+      0.12,
+      mulai
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+      0.001,
+      mulai + 0.12
+    );
+
+    oscillator.start(mulai);
+    oscillator.stop(mulai + 0.12);
+
+  } catch {
+    // Jika perangkat tidak mendukung audio, presensi tetap berjalan.
+  }
+}
+
+
 document.getElementById("mulaiScan").onclick =
 async function() {
 
   if (scannerAktif) {
     scannerAktif = false;
+    proses = false;
+
     scanner.stop();
 
-    this.textContent = "📷 MULAI SCAN";
-    this.className = "";
+    if (timerHasilQR) {
+      clearTimeout(timerHasilQR);
+      timerHasilQR = null;
+    }
+
+    document.getElementById("hasilQR").style.display =
+      "none";
+
+    document.getElementById("statusScanner").textContent =
+      "Scanner dihentikan.";
+
+    this.textContent =
+      "📷 MULAI SCAN";
+
+    this.className =
+      "";
+
     return;
   }
 
@@ -954,21 +1097,38 @@ async function() {
   }
 
   try {
+
+    /*
+      Dipanggil saat guru menekan tombol agar browser HP
+      mengizinkan bunyi beep.
+    */
+    siapkanAudio();
+
+    qrTerakhir = "";
+    waktuScanTerakhir = 0;
+    proses = false;
+
     await scanner.start();
 
     scannerAktif = true;
 
-    this.textContent = "⏹ SELESAI SCAN";
-    this.className = "stop";
+    this.textContent =
+      "⏹ SELESAI SCAN";
+
+    this.className =
+      "stop";
 
     document.getElementById("statusScanner").textContent =
-      "Arahkan kamera ke QR siswa.";
+      "Scanner aktif. Arahkan kamera ke QR siswa.";
 
   } catch {
+    scannerAktif = false;
+
     document.getElementById("statusScanner").textContent =
-      "Kamera gagal dibuka.";
+      "Kamera gagal dibuka. Pastikan izin kamera sudah diberikan.";
   }
 };
+
 
 function tampilQR(d) {
 
@@ -1001,9 +1161,6 @@ function tampilQR(d) {
       "Status: <b>" + d.status + "</b><br>" +
       "Jam: <b>" + d.jam + "</b><br>" +
       "Petugas: <b>" + d.petugas + "</b>";
-
-    if (navigator.vibrate)
-      navigator.vibrate([80,60,80]);
 
   } else if (d.sudahAbsen) {
 
