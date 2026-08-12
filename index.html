@@ -172,6 +172,7 @@ label {
 
 /* CAMERA */
 .camera-box {
+  position: relative;
   overflow: hidden;
   border-radius: 15px;
   background: #000;
@@ -182,6 +183,43 @@ video {
   min-height: 275px;
   display: block;
   object-fit: cover;
+}
+
+/* TOMBOL FLIP KAMERA */
+.flip-camera {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 52px;
+  height: 52px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0,0,0,.58);
+  color: #fff;
+  font-size: 25px;
+  line-height: 1;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  box-shadow: 0 3px 12px rgba(0,0,0,.28);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.flip-camera.show {
+  display: flex;
+}
+
+.flip-camera:active {
+  transform: scale(.94);
+}
+
+.flip-camera:disabled {
+  opacity: .55;
+  cursor: default;
 }
 
 .center {
@@ -487,6 +525,14 @@ video {
 
       <div class="camera-box">
         <video id="qr-video"></video>
+
+        <button
+          id="flipCamera"
+          class="flip-camera"
+          type="button"
+          aria-label="Balik kamera"
+          title="Balik kamera"
+        >🔄</button>
       </div>
 
       <button id="mulaiScan">📷 MULAI SCAN</button>
@@ -700,6 +746,10 @@ let timerResetQR = null;
 let audioContext = null;
 let timerToast = null;
 let toastQrAktif = "";
+
+// Status kamera untuk tombol flip
+let kameraDepan = false;
+let sedangGantiKamera = false;
 
 let siswaManual = null;
 let dataStatus = [];
@@ -933,6 +983,10 @@ function bukaMenu(nama) {
     scannerAktif = false;
     scanner.stop();
 
+    document.getElementById("flipCamera").classList.remove(
+      "show"
+    );
+
     document.getElementById("mulaiScan").textContent =
       "📷 MULAI SCAN";
   }
@@ -958,6 +1012,10 @@ function() {
   if (scannerAktif) {
     scannerAktif = false;
     scanner.stop();
+
+    document.getElementById("flipCamera").classList.remove(
+      "show"
+    );
   }
 
   window.location.href =
@@ -971,6 +1029,10 @@ function() {
   if (scannerAktif) {
     scannerAktif = false;
     scanner.stop();
+
+    document.getElementById("flipCamera").classList.remove(
+      "show"
+    );
   }
 
   window.location.href =
@@ -1235,6 +1297,82 @@ function sembunyikanToastQR() {
 }
 
 
+/*
+  FLIP KAMERA
+  - Default mengikuti preferredCamera: environment (kamera belakang).
+  - Tekan tombol untuk pindah ke kamera depan.
+  - Tekan lagi untuk kembali ke kamera belakang.
+  - Scanner tetap berada pada halaman yang sama.
+*/
+document.getElementById("flipCamera").onclick =
+async function() {
+
+  if (!scannerAktif || sedangGantiKamera) return;
+
+  sedangGantiKamera = true;
+  this.disabled = true;
+
+  const target =
+    kameraDepan
+      ? "environment"
+      : "user";
+
+  const status =
+    document.getElementById("statusScanner");
+
+  status.textContent =
+    target === "user"
+      ? "Mengganti ke kamera depan..."
+      : "Mengganti ke kamera belakang...";
+
+  try {
+
+    await scanner.setCamera(target);
+
+    kameraDepan =
+      target === "user";
+
+    this.setAttribute(
+      "aria-label",
+      kameraDepan
+        ? "Gunakan kamera belakang"
+        : "Gunakan kamera depan"
+    );
+
+    this.title =
+      kameraDepan
+        ? "Gunakan kamera belakang"
+        : "Gunakan kamera depan";
+
+    status.textContent =
+      kameraDepan
+        ? "Kamera depan aktif. Siap scan siswa."
+        : "Kamera belakang aktif. Siap scan siswa.";
+
+    /*
+      Setelah kamera berganti, lepaskan kunci QR lama agar
+      QR berikutnya dapat diproses normal.
+    */
+    qrTerakhir = "";
+
+    if (timerResetQR) {
+      clearTimeout(timerResetQR);
+      timerResetQR = null;
+    }
+
+  } catch {
+
+    status.textContent =
+      "Kamera tidak dapat diganti pada perangkat ini.";
+
+  } finally {
+
+    sedangGantiKamera = false;
+    this.disabled = false;
+  }
+};
+
+
 document.getElementById("mulaiScan").onclick =
 async function() {
 
@@ -1257,6 +1395,10 @@ async function() {
 
     document.getElementById("statusScanner").textContent =
       "Scanner dihentikan.";
+
+    document.getElementById("flipCamera").classList.remove(
+      "show"
+    );
 
     this.textContent =
       "📷 MULAI SCAN";
@@ -1294,6 +1436,10 @@ async function() {
     await scanner.start();
 
     scannerAktif = true;
+
+    document.getElementById("flipCamera").classList.add(
+      "show"
+    );
 
     this.textContent =
       "⏹ SELESAI SCAN";
