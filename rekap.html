@@ -6,6 +6,8 @@
   <title>Rekap Presensi - SMP Islam Cipaku</title>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="https://unpkg.com/jspdf@4.2.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://unpkg.com/jspdf-autotable@5.0.5/dist/jspdf.plugin.autotable.min.js"></script>
 
   <style>
     * { box-sizing: border-box; }
@@ -72,7 +74,7 @@
       display:grid;
       grid-template-columns: repeat(4, 1fr);
       gap:8px;
-      margin-bottom:14px;
+      margin-bottom:8px;
     }
     .stat { background:white; border-radius:12px; padding:12px; text-align:center; }
     .stat strong { display:block; font-size:22px; color:#1b5e20; }
@@ -84,6 +86,12 @@
     th { position:sticky; top:0; background:#1b5e20; color:white; z-index:1; }
     tr:nth-child(even) td { background:#fafafa; }
     .muted { color:#777; font-size:13px; }
+    .summary-note {
+      margin: 0 0 14px;
+      text-align: center;
+      color: #666;
+      font-size: 12px;
+    }
     @media (max-width:760px) {
       .filters { grid-template-columns: 1fr 1fr; }
       .summary { grid-template-columns: 1fr 1fr; }
@@ -151,8 +159,8 @@
           <label>Status</label>
           <select id="statusFilter">
             <option value="">Semua Status</option>
-            <option value="HADIR">Hadir</option>
-            <option value="TERLAMBAT">Terlambat</option>
+            <option value="HADIR">Hadir (termasuk Terlambat)</option>
+            <option value="TERLAMBAT">Terlambat saja</option>
             <option value="SAKIT">Sakit</option>
             <option value="IZIN">Izin</option>
             <option value="ALPA">Alpa</option>
@@ -170,7 +178,7 @@
       <div class="actions">
         <button id="tampilkan">📊 TAMPILKAN REKAP</button>
         <button id="excel" class="secondary" disabled>📗 DOWNLOAD EXCEL</button>
-        <button id="pdf" class="secondary" disabled>📄 SIMPAN PDF</button>
+        <button id="pdf" class="secondary" disabled>📄 DOWNLOAD PDF</button>
       </div>
       <div class="status" id="pesan"></div>
       <div class="muted">Maksimal satu kali proses 200 hari. Untuk periode lebih panjang, bagi menjadi beberapa periode.</div>
@@ -178,13 +186,16 @@
 
     <div class="summary">
       <div class="stat"><strong id="sumBaris">0</strong><small>Baris Rekap</small></div>
-      <div class="stat"><strong id="sumHadir">0</strong><small>Hadir</small></div>
+      <div class="stat"><strong id="sumHadir">0</strong><small>Hadir*</small></div>
       <div class="stat"><strong id="sumTelat">0</strong><small>Terlambat</small></div>
       <div class="stat"><strong id="sumTidak">0</strong><small>Tidak Hadir</small></div>
       <div class="stat"><strong id="sumSakit">0</strong><small>Sakit</small></div>
       <div class="stat"><strong id="sumIzin">0</strong><small>Izin</small></div>
       <div class="stat"><strong id="sumAlpa">0</strong><small>Alpa</small></div>
       <div class="stat"><strong id="sumHaid">0</strong><small>Haid</small></div>
+    </div>
+    <div class="summary-note">
+      * Hadir sudah termasuk siswa yang berstatus Terlambat. Angka Terlambat tetap ditampilkan terpisah.
     </div>
 
     <div class="card">
@@ -390,118 +401,48 @@ $("excel").onclick = function() {
 };
 
 $("pdf").onclick = function() {
-  if (!hasilTerakhir || !hasilTerakhir.data || !hasilTerakhir.data.length) {
-    $("pesan").className = "status error";
-    $("pesan").textContent = "Tampilkan rekap terlebih dahulu sebelum menyimpan PDF.";
-    return;
-  }
+  if (!hasilTerakhir || !hasilTerakhir.data.length) return;
 
-  // PDF dibuat melalui fitur Print/Save as PDF bawaan browser.
-  // Cara ini tidak bergantung pada library PDF eksternal sehingga lebih stabil di HP/laptop.
-  const jendela = window.open("", "_blank");
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:"landscape", unit:"mm", format:"a4" });
 
-  if (!jendela) {
-    $("pesan").className = "status error";
-    $("pesan").textContent = "Jendela PDF diblokir browser. Izinkan pop-up untuk situs ini lalu coba lagi.";
-    return;
-  }
+  doc.setFontSize(14);
+  doc.text("SMP ISLAM CIPAKU", 148.5, 12, {align:"center"});
+  doc.setFontSize(11);
+  doc.text("REKAP PRESENSI KEGIATAN", 148.5, 18, {align:"center"});
+  doc.setFontSize(8);
+  doc.text(
+    `Periode: ${hasilTerakhir.periode.mulai} s.d. ${hasilTerakhir.periode.akhir} | ` +
+    `Kegiatan: ${hasilTerakhir.filter.kegiatan} | Kelas: ${hasilTerakhir.filter.kelas} | ` +
+    `JK: ${hasilTerakhir.filter.jk} | Status: ${hasilTerakhir.filter.status}`,
+    10, 24
+  );
 
-  const esc = (v) => String(v == null ? "" : v)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  const body = hasilTerakhir.data.map((x,i) => [
+    i+1, x.tanggal, x.kegiatan, x.nama, x.kelas, x.jk,
+    x.status, x.jam, x.metode, x.petugas, x.alasan
+  ]);
 
-  const f = hasilTerakhir.filter || {};
-  const p = hasilTerakhir.periode || {};
-  const namaFile = `Rekap_Presensi_${$("tanggalMulai").value}_${$("tanggalAkhir").value}`;
+  doc.autoTable({
+    startY: 28,
+    head: [["No","Tanggal","Kegiatan","Nama","Kelas","JK","Status","Jam","Metode","Petugas","Alasan"]],
+    body,
+    styles: { fontSize:6.5, cellPadding:1.5, overflow:"linebreak" },
+    headStyles: { fillColor:[27,94,32] },
+    columnStyles: {
+      0:{cellWidth:8},1:{cellWidth:18},2:{cellWidth:24},3:{cellWidth:42},
+      4:{cellWidth:14},5:{cellWidth:9},6:{cellWidth:20},7:{cellWidth:16},
+      8:{cellWidth:20},9:{cellWidth:32},10:{cellWidth:45}
+    },
+    didDrawPage: function(data) {
+      const pageCount = doc.getNumberOfPages();
+      doc.setFontSize(7);
+      doc.text(`Halaman ${pageCount}`, 285, 202, {align:"right"});
+    }
+  });
 
-  const rows = hasilTerakhir.data.map((x, i) => `
-    <tr>
-      <td>${i + 1}</td>
-      <td>${esc(x.tanggal)}</td>
-      <td>${esc(x.hari)}</td>
-      <td>${esc(x.kegiatan)}</td>
-      <td>${esc(x.id)}</td>
-      <td>${esc(x.nis)}</td>
-      <td class="nama">${esc(x.nama)}</td>
-      <td>${esc(x.kelas)}</td>
-      <td>${esc(x.jk)}</td>
-      <td>${esc(x.status)}</td>
-      <td>${esc(x.jam)}</td>
-      <td>${esc(x.metode)}</td>
-      <td>${esc(x.petugas)}</td>
-      <td class="alasan">${esc(x.alasan)}</td>
-    </tr>
-  `).join("");
-
-  jendela.document.open();
-  jendela.document.write(`<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${esc(namaFile)}</title>
-<style>
-  @page { size: A4 landscape; margin: 9mm; }
-  * { box-sizing: border-box; }
-  body { font-family: Arial, sans-serif; color:#111; margin:0; }
-  h1 { margin:0; text-align:center; font-size:16px; }
-  h2 { margin:3px 0 7px; text-align:center; font-size:12px; }
-  .meta { font-size:8.5px; margin-bottom:7px; line-height:1.45; }
-  table { width:100%; border-collapse:collapse; table-layout:fixed; font-size:6.7px; }
-  thead { display:table-header-group; }
-  tr { page-break-inside:avoid; }
-  th, td { border:0.3px solid #777; padding:2.2px 2px; vertical-align:top; word-wrap:break-word; }
-  th { background:#e8f5e9; font-weight:bold; text-align:center; }
-  td:nth-child(1), td:nth-child(8), td:nth-child(9) { text-align:center; }
-  .nama { width:15%; }
-  .alasan { width:13%; }
-  .petunjuk { margin-top:8px; font-size:9px; text-align:center; color:#555; }
-  @media print { .petunjuk { display:none; } }
-</style>
-</head>
-<body>
-  <h1>SMP ISLAM CIPAKU</h1>
-  <h2>REKAP PRESENSI</h2>
-  <div class="meta">
-    <b>Periode:</b> ${esc(p.mulai || "-")} s.d. ${esc(p.akhir || "-")} &nbsp; | &nbsp;
-    <b>Kegiatan:</b> ${esc(f.kegiatan || "Semua")} &nbsp; | &nbsp;
-    <b>Kelas:</b> ${esc(f.kelas || "Semua")} &nbsp; | &nbsp;
-    <b>JK:</b> ${esc(f.jk || "Semua")} &nbsp; | &nbsp;
-    <b>Status:</b> ${esc(f.status || "Semua")}<br>
-    <b>Petugas:</b> ${esc(guru || "-")} &nbsp; | &nbsp;
-    <b>Total baris:</b> ${hasilTerakhir.data.length}
-  </div>
-
-  <table>
-    <thead>
-      <tr>
-        <th>No</th><th>Tanggal</th><th>Hari</th><th>Kegiatan</th><th>ID</th><th>NIS</th>
-        <th>Nama</th><th>Kelas</th><th>JK</th><th>Status</th><th>Jam</th><th>Metode</th>
-        <th>Petugas</th><th>Alasan</th>
-      </tr>
-    </thead>
-    <tbody>${rows}</tbody>
-  </table>
-
-  <div class="petunjuk">Pilih <b>Save as PDF / Simpan sebagai PDF</b> pada jendela cetak.</div>
-
-<script>
-  window.onload = function() {
-    setTimeout(function() {
-      window.focus();
-      window.print();
-    }, 350);
-  };
-<\/script>
-</body>
-</html>`);
-  jendela.document.close();
-
-  $("pesan").className = "status";
-  $("pesan").textContent = "Jendela PDF dibuka. Pilih Save as PDF / Simpan sebagai PDF.";
+  const nama = `Rekap_Presensi_${$("tanggalMulai").value}_${$("tanggalAkhir").value}.pdf`;
+  doc.save(nama);
 };
 
 $("preset").onchange = aturPreset;
