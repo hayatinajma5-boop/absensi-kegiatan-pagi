@@ -236,6 +236,53 @@ video {
   text-align: center;
 }
 
+/* MODE SCAN KILAT */
+.scan-mode-title {
+  text-align: center;
+  font-weight: bold;
+  color: #1b5e20;
+  margin-bottom: 10px;
+}
+
+.scan-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+}
+
+.scan-stat {
+  background: #f5f7f5;
+  border-radius: 11px;
+  padding: 9px 4px;
+  text-align: center;
+}
+
+.scan-stat b {
+  display: block;
+  font-size: 21px;
+  color: #1b5e20;
+  line-height: 1.1;
+}
+
+.scan-stat small {
+  display: block;
+  margin-top: 4px;
+  color: #666;
+  font-size: 11px;
+}
+
+.scan-stat.gagal b {
+  color: #b71c1c;
+}
+
+.scan-kilat-note {
+  margin-top: 9px;
+  text-align: center;
+  color: #666;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
 .hasil {
   display: none;
   background: white;
@@ -528,9 +575,35 @@ video {
     <!-- QR -->
     <div id="halamanQR">
 
-      <div class="card center">
-        Presensi sesi ini:
-        <b id="counter" class="sukses">0</b>
+      <div class="card">
+        <div class="scan-mode-title">⚡ MODE SCAN KILAT</div>
+
+        <div class="scan-stats">
+          <div class="scan-stat">
+            <b id="counterTerbaca">0</b>
+            <small>Terbaca</small>
+          </div>
+
+          <div class="scan-stat">
+            <b id="counter">0</b>
+            <small>Tersimpan</small>
+          </div>
+
+          <div class="scan-stat">
+            <b id="counterAntrean">0</b>
+            <small>Antrean</small>
+          </div>
+
+          <div class="scan-stat gagal">
+            <b id="counterGagal">0</b>
+            <small>Gagal</small>
+          </div>
+        </div>
+
+        <div class="scan-kilat-note">
+          Setelah bunyi singkat, langsung arahkan QR siswa berikutnya.
+          Penyimpanan berjalan otomatis di belakang.
+        </div>
       </div>
 
       <div class="camera-box">
@@ -757,8 +830,16 @@ let namaGuru =
 
 let kegiatanAktif = "";
 let scannerAktif = false;
-let proses = false;
 let totalScan = 0;
+
+// MODE SCAN KILAT
+let totalTerbaca = 0;
+let totalGagal = 0;
+let antrianQR = [];
+let pekerjaAntrianAktif = false;
+let itemSedangDiproses = null;
+const idTerkunciSesi = new Set();
+const TIMEOUT_PRESENSI_MS = 15000;
 
 // Optimasi scanner QR
 let qrTerakhir = "";
@@ -922,6 +1003,16 @@ if (token && namaGuru) {
 document.getElementById("logout").onclick =
 async function() {
 
+  const pending = jumlahBelumSinkron();
+
+  if (pending > 0) {
+    alert(
+      "Masih ada " + pending +
+      " presensi yang sedang disimpan. Tunggu sampai Antrean = 0 sebelum keluar."
+    );
+    return;
+  }
+
   scannerAktif = false;
   scanner.stop();
 
@@ -1029,6 +1120,16 @@ document.getElementById("menuStatus").onclick =
 document.getElementById("menuRekap").onclick =
 function() {
 
+  const pending = jumlahBelumSinkron();
+
+  if (pending > 0) {
+    alert(
+      "Masih ada " + pending +
+      " presensi yang sedang disimpan. Tunggu sampai Antrean = 0 sebelum membuka Rekap."
+    );
+    return;
+  }
+
   if (scannerAktif) {
     scannerAktif = false;
     scanner.stop();
@@ -1046,6 +1147,16 @@ function() {
 document.getElementById("menuAdmin").onclick =
 function() {
 
+  const pending = jumlahBelumSinkron();
+
+  if (pending > 0) {
+    alert(
+      "Masih ada " + pending +
+      " presensi yang sedang disimpan. Tunggu sampai Antrean = 0 sebelum membuka Admin."
+    );
+    return;
+  }
+
   if (scannerAktif) {
     scannerAktif = false;
     scanner.stop();
@@ -1060,23 +1171,24 @@ function() {
 };
 
 
-/* QR */
+/* QR - MODE SCAN KILAT */
 
 /*
-  Scanner tetap menyala selama sesi.
-
-  Perilaku popup:
-  - Popup muncul saat server mengonfirmasi hasil scan.
-  - Selama QR yang sama masih terlihat kamera, popup tetap tampil.
-  - Setelah QR tersebut tidak terlihat lagi, popup menghilang 0,8 detik kemudian.
-  - Jika QR siswa berikutnya terbaca lebih dulu, popup baru langsung menggantikan popup lama.
+  TUJUAN MODE SCAN KILAT
+  ----------------------
+  1. Kamera tidak menunggu server sebelum menerima QR siswa berikutnya.
+  2. Setiap QR unik langsung masuk antrean lokal.
+  3. Presensi dikirim ke Apps Script satu per satu di belakang layar.
+  4. Anti-double utama tetap ditentukan backend.
+  5. QR yang sama dikunci secara lokal selama sesi agar tidak memenuhi antrean.
 */
+
 const scanner =
 new QrScanner(
 
   document.getElementById("qr-video"),
 
-  async hasil => {
+  hasil => {
 
     if (!scannerAktif) return;
 
@@ -1086,54 +1198,35 @@ new QrScanner(
     if (!idQR) return;
 
     /*
-      Bila popup untuk QR ini sedang tampil, setiap kali kamera
-      masih mendeteksi QR yang sama kita mulai ulang hitungan 0,8 detik.
-      Artinya popup tidak hilang selama QR masih disorot.
+      Bila popup hasil QR ini sedang tampil dan QR-nya masih terlihat,
+      pertahankan popup sebentar lagi.
     */
     if (toastQrAktif === idQR) {
       jadwalkanToastHilang(idQR);
     }
 
     /*
-      QR yang sama tidak dikirim berkali-kali selama masih berada
-      di depan kamera. Timer di-reset setiap kali QR yang sama masih terlihat.
+      Mencegah callback berulang dari QR yang sama selama kartu
+      masih berada di depan kamera.
     */
     if (idQR === qrTerakhir) {
       jadwalkanResetQR(idQR);
       return;
     }
 
-    /*
-      Bila request sebelumnya masih diproses, kamera tetap menyala.
-      QR berikutnya akan terbaca lagi ketika request selesai jika masih diarahkan.
-    */
-    if (proses) return;
-
     qrTerakhir = idQR;
     jadwalkanResetQR(idQR);
-    proses = true;
 
-    document.getElementById("statusScanner").textContent =
-      "QR terbaca. Menyimpan presensi...";
-
-    const d =
-      await post({
-        action: "catatPresensi",
-        idSiswa: idQR,
-        kegiatan: kegiatanAktif,
-        token: token,
-        metode: "QR",
-        alasan: "-"
-      });
-
-    tampilQR(d, idQR);
-
-    proses = false;
-
-    if (scannerAktif) {
-      document.getElementById("statusScanner").textContent =
-        "Siap scan siswa berikutnya.";
+    /*
+      Jika ID ini sudah pernah diterima dalam sesi halaman ini,
+      jangan masukkan lagi. Backend tetap menjadi pengaman final.
+      Jika request benar-benar gagal, kunci ini dilepas agar bisa discan ulang.
+    */
+    if (idTerkunciSesi.has(idQR)) {
+      return;
     }
+
+    masukkanKeAntrean(idQR);
   },
 
   {
@@ -1145,10 +1238,196 @@ new QrScanner(
 );
 
 
+function masukkanKeAntrean(idQR) {
+
+  idTerkunciSesi.add(idQR);
+
+  totalTerbaca++;
+
+  antrianQR.push({
+    idQR: idQR,
+    kegiatan: kegiatanAktif,
+    token: token,
+    waktuMasuk: Date.now()
+  });
+
+  /*
+    Bunyi ini berarti "QR SUDAH TERBACA / MASUK ANTREAN",
+    bukan berarti server sudah selesai menyimpan.
+    Jadi siswa bisa langsung bergeser dan siswa berikutnya maju.
+  */
+  bunyiTerbaca();
+
+  if (navigator.vibrate) {
+    navigator.vibrate(45);
+  }
+
+  perbaruiStatScan();
+
+  document.getElementById("statusScanner").textContent =
+    "⚡ QR terbaca. Siswa berikutnya silakan maju.";
+
+  jalankanAntrean();
+}
+
+
+function jumlahBelumSinkron() {
+  return (
+    antrianQR.length +
+    (itemSedangDiproses ? 1 : 0)
+  );
+}
+
+
+function perbaruiStatScan() {
+
+  document.getElementById("counterTerbaca").textContent =
+    totalTerbaca;
+
+  document.getElementById("counter").textContent =
+    totalScan;
+
+  document.getElementById("counterAntrean").textContent =
+    jumlahBelumSinkron();
+
+  document.getElementById("counterGagal").textContent =
+    totalGagal;
+
+  if (
+    !scannerAktif &&
+    jumlahBelumSinkron() === 0 &&
+    totalTerbaca > 0
+  ) {
+    document.getElementById("statusScanner").textContent =
+      "✅ Semua antrean sudah selesai disimpan.";
+  }
+}
+
+
+async function kirimPresensiAntrean(item) {
+
+  const controller =
+    typeof AbortController !== "undefined"
+      ? new AbortController()
+      : null;
+
+  let timer = null;
+
+  if (controller) {
+    timer = setTimeout(
+      () => controller.abort(),
+      TIMEOUT_PRESENSI_MS
+    );
+  }
+
+  try {
+
+    const response =
+      await fetch(
+        API,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=UTF-8"
+          },
+          body: JSON.stringify({
+            action: "catatPresensi",
+            idSiswa: item.idQR,
+            kegiatan: item.kegiatan,
+            token: item.token,
+            metode: "QR",
+            alasan: "-"
+          }),
+          signal: controller
+            ? controller.signal
+            : undefined
+        }
+      );
+
+    return await response.json();
+
+  } catch (error) {
+
+    if (
+      error &&
+      error.name === "AbortError"
+    ) {
+      return {
+        berhasil: false,
+        gagalKoneksi: true,
+        pesan:
+          "Server terlalu lama merespons. Scan ulang siswa ini setelah antrean berjalan."
+      };
+    }
+
+    return {
+      berhasil: false,
+      gagalKoneksi: true,
+      pesan:
+        "Tidak dapat terhubung ke server. Scan ulang siswa ini."
+    };
+
+  } finally {
+
+    if (timer) {
+      clearTimeout(timer);
+    }
+  }
+}
+
+
+async function jalankanAntrean() {
+
+  if (pekerjaAntrianAktif) return;
+
+  pekerjaAntrianAktif = true;
+
+  try {
+
+    while (antrianQR.length > 0) {
+
+      itemSedangDiproses =
+        antrianQR.shift();
+
+      perbaruiStatScan();
+
+      const d =
+        await kirimPresensiAntrean(
+          itemSedangDiproses
+        );
+
+      const idSelesai =
+        itemSedangDiproses.idQR;
+
+      tampilQR(d, idSelesai);
+
+      /*
+        Jika gagal sungguhan, ID dilepas supaya guru bisa scan ulang.
+        Jika berhasil / sudah absen, tetap dikunci selama sesi halaman ini.
+      */
+      if (
+        !d ||
+        (!d.berhasil && !d.sudahAbsen)
+      ) {
+        idTerkunciSesi.delete(idSelesai);
+      }
+
+      itemSedangDiproses = null;
+      perbaruiStatScan();
+    }
+
+  } finally {
+
+    itemSedangDiproses = null;
+    pekerjaAntrianAktif = false;
+    perbaruiStatScan();
+  }
+}
+
+
 /*
-  QR yang sama baru boleh diproses lagi setelah tidak terdeteksi
-  selama 0,8 detik. Selama QR masih terlihat, callback scanner
-  terus memperbarui timer ini.
+  QR yang sama baru dianggap pergi setelah tidak terdeteksi 0,6 detik.
+  Selama masih terlihat, callback scanner terus memperbarui timer ini.
 */
 function jadwalkanResetQR(idQR) {
 
@@ -1161,14 +1440,13 @@ function jadwalkanResetQR(idQR) {
       qrTerakhir = "";
     }
     timerResetQR = null;
-  }, 800);
+  }, 600);
 }
 
 
 /*
   AudioContext disiapkan dari klik tombol MULAI SCAN.
-  Ini lebih kompatibel dengan browser HP dibanding membuat
-  AudioContext baru setiap kali QR berhasil.
+  Ini lebih kompatibel dengan browser HP.
 */
 function siapkanAudio() {
 
@@ -1193,11 +1471,13 @@ function siapkanAudio() {
 }
 
 
-function bunyiBerhasil() {
+/* Bunyi pendek: QR sudah masuk antrean. */
+function bunyiTerbaca() {
 
   if (!audioContext) return;
 
   try {
+
     const oscillator =
       audioContext.createOscillator();
 
@@ -1214,33 +1494,83 @@ function bunyiBerhasil() {
       "sine";
 
     oscillator.frequency.setValueAtTime(
-      1150,
+      1350,
       mulai
     );
 
     gain.gain.setValueAtTime(
-      0.12,
+      0.11,
       mulai
     );
 
     gain.gain.exponentialRampToValueAtTime(
       0.001,
-      mulai + 0.12
+      mulai + 0.075
     );
 
     oscillator.start(mulai);
-    oscillator.stop(mulai + 0.12);
+    oscillator.stop(mulai + 0.075);
 
   } catch {
-    // Jika perangkat tidak mendukung audio, presensi tetap berjalan.
+    // Presensi tetap berjalan walaupun audio tidak tersedia.
+  }
+}
+
+
+/* Bunyi lebih rendah untuk warning / gagal agar mudah dibedakan. */
+function bunyiPeringatan() {
+
+  if (!audioContext) return;
+
+  try {
+
+    const mulai =
+      audioContext.currentTime;
+
+    [0, 0.13].forEach(
+      offset => {
+
+        const oscillator =
+          audioContext.createOscillator();
+
+        const gain =
+          audioContext.createGain();
+
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+
+        oscillator.type =
+          "sine";
+
+        oscillator.frequency.setValueAtTime(
+          520,
+          mulai + offset
+        );
+
+        gain.gain.setValueAtTime(
+          0.10,
+          mulai + offset
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+          0.001,
+          mulai + offset + 0.09
+        );
+
+        oscillator.start(mulai + offset);
+        oscillator.stop(mulai + offset + 0.09);
+      }
+    );
+
+  } catch {
+    // Presensi tetap berjalan walaupun audio tidak tersedia.
   }
 }
 
 
 /*
-  Menjadwalkan popup hilang 0,8 detik setelah QR terakhir kali
-  terlihat. Jika QR yang sama masih terlihat, fungsi ini dipanggil
-  lagi dan hitungan 0,8 detik dimulai ulang.
+  Popup hasil server tetap non-blocking.
+  Jadi popup boleh muncul sementara kamera terus menerima QR baru.
 */
 function jadwalkanToastHilang(idQR) {
 
@@ -1252,7 +1582,7 @@ function jadwalkanToastHilang(idQR) {
     if (toastQrAktif === idQR) {
       sembunyikanToastQR();
     }
-  }, 800);
+  }, 900);
 }
 
 
@@ -1288,16 +1618,9 @@ function tampilToastQR(tipe, judul, pesan, idQR) {
   title.textContent = judul;
   message.textContent = pesan || "";
 
-  // Memaksa browser membaca state awal agar animasi tetap muncul
-  // walaupun scan dilakukan berurutan dengan cepat.
   void toast.offsetWidth;
   toast.classList.add("show");
 
-  /*
-    Jika QR langsung dipindahkan setelah bunyi, popup tetap terlihat
-    selama 0,8 detik. Jika QR masih terlihat, callback scanner akan
-    terus memperbarui timer ini sehingga popup tetap tampil.
-  */
   jadwalkanToastHilang(toastQrAktif);
 }
 
@@ -1317,13 +1640,7 @@ function sembunyikanToastQR() {
 }
 
 
-/*
-  FLIP KAMERA
-  - Default mengikuti preferredCamera: environment (kamera belakang).
-  - Tekan tombol untuk pindah ke kamera depan.
-  - Tekan lagi untuk kembali ke kamera belakang.
-  - Scanner tetap berada pada halaman yang sama.
-*/
+/* FLIP KAMERA */
 document.getElementById("flipCamera").onclick =
 async function() {
 
@@ -1366,13 +1683,9 @@ async function() {
 
     status.textContent =
       kameraDepan
-        ? "Kamera depan aktif. Siap scan siswa."
-        : "Kamera belakang aktif. Siap scan siswa.";
+        ? "Kamera depan aktif. Mode Scan Kilat siap."
+        : "Kamera belakang aktif. Mode Scan Kilat siap.";
 
-    /*
-      Setelah kamera berganti, lepaskan kunci QR lama agar
-      QR berikutnya dapat diproses normal.
-    */
     qrTerakhir = "";
 
     if (timerResetQR) {
@@ -1397,9 +1710,8 @@ document.getElementById("mulaiScan").onclick =
 async function() {
 
   if (scannerAktif) {
-    scannerAktif = false;
-    proses = false;
 
+    scannerAktif = false;
     scanner.stop();
 
     if (timerResetQR) {
@@ -1413,9 +1725,6 @@ async function() {
     document.getElementById("hasilQR").style.display =
       "none";
 
-    document.getElementById("statusScanner").textContent =
-      "Scanner dihentikan.";
-
     document.getElementById("flipCamera").classList.remove(
       "show"
     );
@@ -1425,6 +1734,14 @@ async function() {
 
     this.className =
       "";
+
+    const pending =
+      jumlahBelumSinkron();
+
+    document.getElementById("statusScanner").textContent =
+      pending > 0
+        ? "Scanner dihentikan. Menyelesaikan " + pending + " antrean..."
+        : "Scanner dihentikan. Semua data sudah tersimpan.";
 
     return;
   }
@@ -1437,14 +1754,9 @@ async function() {
 
   try {
 
-    /*
-      Dipanggil saat guru menekan tombol agar browser HP
-      mengizinkan bunyi beep.
-    */
     siapkanAudio();
 
     qrTerakhir = "";
-    proses = false;
 
     if (timerResetQR) {
       clearTimeout(timerResetQR);
@@ -1468,9 +1780,10 @@ async function() {
       "stop";
 
     document.getElementById("statusScanner").textContent =
-      "Scanner aktif. Arahkan kamera ke QR siswa.";
+      "⚡ Mode Scan Kilat aktif. Scan QR lalu langsung siswa berikutnya.";
 
   } catch {
+
     scannerAktif = false;
 
     document.getElementById("statusScanner").textContent =
@@ -1483,34 +1796,23 @@ function tampilQR(d, idQR) {
 
   if (cekLoginHabis(d)) return;
 
-  // Kotak hasil lama tidak dipakai pada mode popup.
   document.getElementById("hasilQR").style.display =
     "none";
 
-  if (d.berhasil) {
+  if (d && d.berhasil) {
 
     totalScan++;
 
-    document.getElementById("counter").textContent =
-      totalScan;
-
     tampilToastQR(
       "success",
-      "Presensi berhasil",
+      "Tersimpan",
       (d.nama || "Siswa") +
       " • Kelas " + (d.kelas || "-") +
       " • " + (d.status || "Tercatat"),
       idQR
     );
 
-    // Popup, beep, dan getar diberikan pada momen yang sama.
-    bunyiBerhasil();
-
-    if (navigator.vibrate) {
-      navigator.vibrate(100);
-    }
-
-  } else if (d.sudahAbsen) {
+  } else if (d && d.sudahAbsen) {
 
     tampilToastQR(
       "warning",
@@ -1522,16 +1824,50 @@ function tampilQR(d, idQR) {
       idQR
     );
 
+    bunyiPeringatan();
+
+    if (navigator.vibrate) {
+      navigator.vibrate([70, 60, 70]);
+    }
+
   } else {
+
+    totalGagal++;
 
     tampilToastQR(
       "error",
       "Presensi gagal",
-      d.pesan || "Data siswa tidak ditemukan.",
+      (d && d.pesan)
+        ? d.pesan
+        : "Data siswa tidak ditemukan.",
       idQR
     );
+
+    bunyiPeringatan();
+
+    if (navigator.vibrate) {
+      navigator.vibrate([120, 80, 120]);
+    }
   }
+
+  perbaruiStatScan();
 }
+
+
+/*
+  Jangan biarkan halaman ditutup saat masih ada antrean yang belum
+  mendapat jawaban server. Browser tertentu mungkin hanya menampilkan
+  peringatan standar, tetapi ini tetap membantu mencegah data hilang.
+*/
+window.addEventListener(
+  "beforeunload",
+  event => {
+    if (jumlahBelumSinkron() > 0) {
+      event.preventDefault();
+      event.returnValue = "";
+    }
+  }
+);
 
 
 /* ABSEN MANUAL */
