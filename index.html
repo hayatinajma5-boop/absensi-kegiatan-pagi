@@ -1115,6 +1115,171 @@ video {
   }
 }
 
+
+
+/* =====================================================
+   RFID PRODUKSI — MODE TAP KILAT
+===================================================== */
+#halamanRFID {
+  display: none;
+}
+
+.rfid-reader {
+  min-height: 235px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 2px dashed #7cb8a4;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fbfdfc, #f3f8f5);
+  padding: 22px 14px;
+}
+
+.rfid-reader-icon {
+  font-size: 46px;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.rfid-ready {
+  color: #24483d;
+  font-size: 23px;
+  font-weight: 850;
+}
+
+.rfid-name {
+  color: #0f5f46;
+  font-size: 31px;
+  line-height: 1.12;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.rfid-class {
+  margin-top: 7px;
+  color: #61746c;
+  font-size: 17px;
+  font-weight: 750;
+}
+
+.rfid-badge {
+  display: inline-block;
+  margin-top: 13px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: .025em;
+}
+
+.rfid-badge.scan {
+  background: #def4e9;
+  color: #176246;
+}
+
+.rfid-badge.absen {
+  background: #fff0c9;
+  color: #8a5c00;
+}
+
+.rfid-badge.fail {
+  background: #ffebee;
+  color: #b71c1c;
+}
+
+.rfid-mini-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.rfid-mini-stat {
+  padding: 11px 8px;
+  border-radius: 12px;
+  background: #f5f7f5;
+  text-align: center;
+}
+
+.rfid-mini-stat b {
+  display: block;
+  color: #0f5f46;
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.rfid-mini-stat small {
+  display: block;
+  margin-top: 4px;
+  color: #6d7e76;
+  font-size: 11px;
+}
+
+.rfid-fail-box {
+  display: none;
+  margin-top: 12px;
+  padding: 12px 13px;
+  border: 1px solid #efcccc;
+  border-radius: 12px;
+  background: #fff7f7;
+  text-align: left;
+}
+
+.rfid-fail-title {
+  color: #a63d3d;
+  font-size: 13px;
+  font-weight: 900;
+  margin-bottom: 6px;
+}
+
+.rfid-fail-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #734949;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.rfid-note {
+  margin-top: 11px;
+  color: #718078;
+  font-size: 12px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+#rfidInput {
+  position: fixed;
+  left: -100px;
+  top: -100px;
+  width: 1px;
+  height: 1px;
+  opacity: .01;
+  pointer-events: none;
+}
+
+@media (max-width: 420px) {
+  .rfid-reader { min-height: 210px; }
+  .rfid-name { font-size: 27px; }
+}
+
+
+/* TAP KARTU memakai bahasa visual yang sama dengan Scan QR. */
+.rfid-reader-unified {
+  margin-bottom: 12px;
+  min-height: 275px;
+  border: none;
+  background: #f7faf8;
+  box-shadow: inset 0 0 0 1px #e1ebe5;
+}
+.rfid-reader-unified .rfid-reader-icon {
+  font-size: 56px;
+}
+.rfid-reader-unified .rfid-ready {
+  color: #1b5e20;
+}
+
 </style>
 </head>
 
@@ -1197,6 +1362,10 @@ video {
     <div class="menu">
       <button id="menuQR">📷 SCAN QR</button>
 
+      <button id="menuRFID" class="secondary">
+        💳 TAP KARTU
+      </button>
+
       <button id="menuManual" class="secondary">
         ✍️ ABSEN MANUAL
       </button>
@@ -1209,7 +1378,7 @@ video {
         📊 REKAP & EXPORT
       </button>
 
-      <button id="menuAdmin" class="secondary wide">
+      <button id="menuAdmin" class="secondary">
         ⚙️ ADMIN / DATA SISWA
       </button>
     </div>
@@ -1322,6 +1491,113 @@ video {
         <div id="namaQR" class="nama-siswa"></div>
         <div id="kelasQR"></div>
         <div id="detailQR"></div>
+      </div>
+
+    </div>
+
+    <!-- RFID / TAP KARTU -->
+    <div id="halamanRFID">
+
+      <input
+        id="rfidInput"
+        type="text"
+        inputmode="none"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+        aria-label="Input reader kartu"
+      >
+
+      <div class="card">
+        <div class="scan-mode-title">⚡ MODE SCAN KILAT</div>
+
+        <div class="scan-stats">
+          <div class="scan-stat">
+            <b id="counterRFIDTerbaca">0</b>
+            <small>Terbaca</small>
+          </div>
+
+          <div class="scan-stat">
+            <b id="counterRFIDTersimpan">0</b>
+            <small>Tersimpan</small>
+          </div>
+
+          <div class="scan-stat">
+            <b id="counterRFIDAntrean">0</b>
+            <small>Antrean</small>
+          </div>
+
+          <div class="scan-stat gagal">
+            <b id="counterRFIDGagal">0</b>
+            <small>Gagal</small>
+          </div>
+        </div>
+
+        <div class="scan-kilat-note">
+          Setelah bunyi singkat, langsung tempelkan kartu siswa berikutnya.
+          Penyimpanan berjalan otomatis di belakang.
+        </div>
+      </div>
+
+      <div class="card scan-detail-card">
+        <div class="scan-detail-header">
+          <div>
+            <div class="scan-detail-title">🔎 Detail Sinkronisasi</div>
+            <div class="scan-detail-subtitle">
+              Lihat siapa yang sedang diproses, masih menunggu, atau gagal.
+            </div>
+          </div>
+
+          <button
+            id="toggleDetailRFID"
+            class="secondary scan-detail-toggle"
+            type="button"
+          >TUTUP</button>
+        </div>
+
+        <div id="detailRFIDBody" class="scan-detail-body">
+
+          <div class="scan-detail-section">
+            <div class="scan-detail-heading">
+              <span>⏳ Sedang diproses</span>
+              <span id="badgeRFIDSedangProses" class="scan-detail-badge">0</span>
+            </div>
+            <div id="detailRFIDSedangProses" class="scan-detail-empty">
+              Tidak ada data yang sedang diproses.
+            </div>
+          </div>
+
+          <div class="scan-detail-section">
+            <div class="scan-detail-heading">
+              <span>🕐 Menunggu antrean</span>
+              <span id="badgeRFIDMenunggu" class="scan-detail-badge">0</span>
+            </div>
+            <div id="detailRFIDMenunggu" class="scan-detail-list">
+              <div class="scan-detail-empty">Antrean kosong.</div>
+            </div>
+          </div>
+
+          <div class="scan-detail-section">
+            <div class="scan-detail-heading">
+              <span>❌ Gagal / perlu diperiksa</span>
+              <span id="badgeRFIDGagal" class="scan-detail-badge bad">0</span>
+            </div>
+            <div id="detailRFIDGagal" class="scan-detail-list">
+              <div class="scan-detail-empty">Tidak ada presensi gagal.</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="rfid-reader rfid-reader-unified">
+        <div>
+          <div class="rfid-reader-icon">💳</div>
+          <div class="rfid-ready">Tempelkan Kartu</div>
+          <div id="statusRFID" class="scan-kilat-note">
+            Menyiapkan reader...
+          </div>
+        </div>
       </div>
 
     </div>
@@ -1555,6 +1831,20 @@ let siswaManual = null;
 let dataStatus = [];
 let siswaUbah = null;
 
+// RFID PRODUKSI
+let rfidAktif = false;
+let rfidMapping = {};
+let rfidSudahAbsen = new Set();
+let rfidAntrean = [];
+let rfidPekerjaAktif = false;
+let rfidSedangDiproses = null;
+let rfidUidDiproses = new Set();
+let rfidDaftarGagal = [];
+let rfidTotalTap = 0;
+let rfidTotalTersimpan = 0;
+let rfidDetailTerbuka = true;
+const RFID_TIMEOUT_MS = 15000;
+
 
 /* UTIL */
 function post(data) {
@@ -1702,12 +1992,12 @@ if (token && namaGuru) {
 document.getElementById("logout").onclick =
 async function() {
 
-  const pending = jumlahBelumSinkron();
+  const pending = jumlahBelumSinkronSemua();
 
   if (pending > 0) {
     alert(
       "Masih ada " + pending +
-      " presensi yang sedang disimpan. Tunggu sampai Antrean = 0 sebelum keluar."
+      " presensi QR/RFID yang sedang disimpan. Tunggu sampai antrean selesai sebelum keluar."
     );
     return;
   }
@@ -1780,6 +2070,9 @@ function bukaMenu(nama) {
   document.getElementById("halamanQR").style.display =
     nama === "QR" ? "block" : "none";
 
+  document.getElementById("halamanRFID").style.display =
+    nama === "RFID" ? "block" : "none";
+
   document.getElementById("halamanManual").style.display =
     nama === "MANUAL" ? "block" : "none";
 
@@ -1801,6 +2094,16 @@ function bukaMenu(nama) {
       "📷 MULAI SCAN";
   }
 
+  if (nama !== "RFID") {
+    rfidAktif = false;
+    const inputRFID = document.getElementById("rfidInput");
+    if (inputRFID) inputRFID.blur();
+  }
+
+  if (nama === "RFID") {
+    aktifkanRFID();
+  }
+
   if (nama === "STATUS") {
     loadStatus();
   }
@@ -1808,6 +2111,9 @@ function bukaMenu(nama) {
 
 document.getElementById("menuQR").onclick =
   () => bukaMenu("QR");
+
+document.getElementById("menuRFID").onclick =
+  () => bukaMenu("RFID");
 
 document.getElementById("menuManual").onclick =
   () => bukaMenu("MANUAL");
@@ -1819,12 +2125,12 @@ document.getElementById("menuStatus").onclick =
 document.getElementById("menuRekap").onclick =
 function() {
 
-  const pending = jumlahBelumSinkron();
+  const pending = jumlahBelumSinkronSemua();
 
   if (pending > 0) {
     alert(
       "Masih ada " + pending +
-      " presensi yang sedang disimpan. Tunggu sampai Antrean = 0 sebelum membuka Rekap."
+      " presensi QR/RFID yang sedang disimpan. Tunggu sampai antrean selesai sebelum membuka Rekap."
     );
     return;
   }
@@ -1846,12 +2152,12 @@ function() {
 document.getElementById("menuAdmin").onclick =
 function() {
 
-  const pending = jumlahBelumSinkron();
+  const pending = jumlahBelumSinkronSemua();
 
   if (pending > 0) {
     alert(
       "Masih ada " + pending +
-      " presensi yang sedang disimpan. Tunggu sampai Antrean = 0 sebelum membuka Admin."
+      " presensi QR/RFID yang sedang disimpan. Tunggu sampai antrean selesai sebelum membuka Admin."
     );
     return;
   }
@@ -1870,6 +2176,687 @@ function() {
 };
 
 
+/* RFID / TAP KARTU - ALUR SAMA DENGAN QR */
+
+function normalisasiUidRFID(uid) {
+  uid = String(uid || "").trim().replace(/\D/g, "");
+
+  if (uid && uid.length < 10) {
+    uid = uid.padStart(10, "0");
+  }
+
+  return uid;
+}
+
+
+function fokusRFID() {
+  if (!rfidAktif) return;
+
+  setTimeout(() => {
+    if (!rfidAktif) return;
+
+    const input = document.getElementById("rfidInput");
+    if (!input) return;
+
+    try {
+      input.focus({ preventScroll: true });
+    } catch {
+      input.focus();
+    }
+  }, 30);
+}
+
+
+function jumlahBelumSinkronRFID() {
+  return (
+    rfidAntrean.length +
+    (rfidSedangDiproses ? 1 : 0)
+  );
+}
+
+
+function jumlahBelumSinkronSemua() {
+  return jumlahBelumSinkron() + jumlahBelumSinkronRFID();
+}
+
+
+function perbaruiStatRFID() {
+  const gagal = rfidDaftarGagal.length;
+
+  document.getElementById("counterRFIDTerbaca").textContent =
+    rfidTotalTap;
+
+  document.getElementById("counterRFIDTersimpan").textContent =
+    rfidTotalTersimpan;
+
+  document.getElementById("counterRFIDAntrean").textContent =
+    jumlahBelumSinkronRFID();
+
+  document.getElementById("counterRFIDGagal").textContent =
+    gagal;
+}
+
+
+function identitasRFID(item) {
+  if (!item) return "Kartu";
+
+  const nama =
+    item.nama || ("UID " + (item.uid || "-"));
+
+  const kelas =
+    item.kelas ? (" • Kelas " + item.kelas) : "";
+
+  return nama + kelas;
+}
+
+
+function perbaruiDetailRFID() {
+  const body = document.getElementById("detailRFIDBody");
+  const badgeProses = document.getElementById("badgeRFIDSedangProses");
+  const badgeMenunggu = document.getElementById("badgeRFIDMenunggu");
+  const badgeGagal = document.getElementById("badgeRFIDGagal");
+  const proses = document.getElementById("detailRFIDSedangProses");
+  const menunggu = document.getElementById("detailRFIDMenunggu");
+  const gagal = document.getElementById("detailRFIDGagal");
+
+  if (!body || !badgeProses || !badgeMenunggu || !badgeGagal ||
+      !proses || !menunggu || !gagal) {
+    return;
+  }
+
+  body.style.display =
+    rfidDetailTerbuka ? "block" : "none";
+
+  badgeProses.textContent =
+    rfidSedangDiproses ? "1" : "0";
+
+  badgeMenunggu.textContent =
+    String(rfidAntrean.length);
+
+  badgeGagal.textContent =
+    String(rfidDaftarGagal.length);
+
+  if (rfidSedangDiproses) {
+    const durasi =
+      Date.now() -
+      (rfidSedangDiproses.waktuMulaiProses ||
+       rfidSedangDiproses.waktuMasuk ||
+       Date.now());
+
+    proses.className =
+      "scan-detail-item " + kelasDurasi(durasi, "proses");
+
+    proses.innerHTML =
+      '<div class="scan-detail-main">' +
+        '<div class="scan-detail-name">' +
+          escapeHtml(rfidSedangDiproses.nama || ("UID " + rfidSedangDiproses.uid)) +
+        '</div>' +
+        '<div class="scan-detail-meta">' +
+          (rfidSedangDiproses.kelas
+            ? "Kelas " + escapeHtml(rfidSedangDiproses.kelas)
+            : "Kartu sedang dikirim ke server") +
+        '</div>' +
+      '</div>' +
+      '<div class="scan-detail-time">' +
+        escapeHtml(labelDurasi(durasi, "proses")) +
+      '</div>';
+
+  } else {
+    proses.className = "scan-detail-empty";
+    proses.textContent =
+      "Tidak ada data yang sedang diproses.";
+  }
+
+  if (rfidAntrean.length === 0) {
+    menunggu.innerHTML =
+      '<div class="scan-detail-empty">Antrean kosong.</div>';
+  } else {
+    menunggu.innerHTML =
+      rfidAntrean.map(item => {
+        const durasi =
+          Date.now() - (item.waktuMasuk || Date.now());
+
+        const cls =
+          kelasDurasi(durasi, "tunggu");
+
+        return (
+          '<div class="scan-detail-item ' + cls + '">' +
+            '<div class="scan-detail-main">' +
+              '<div class="scan-detail-name">' +
+                escapeHtml(item.nama || ("UID " + item.uid)) +
+              '</div>' +
+              '<div class="scan-detail-meta">' +
+                (item.kelas
+                  ? "Kelas " + escapeHtml(item.kelas)
+                  : "Menunggu dikirim") +
+              '</div>' +
+            '</div>' +
+            '<div class="scan-detail-time">' +
+              escapeHtml(labelDurasi(durasi, "tunggu")) +
+            '</div>' +
+          '</div>'
+        );
+      }).join("");
+  }
+
+  if (rfidDaftarGagal.length === 0) {
+    gagal.innerHTML =
+      '<div class="scan-detail-empty">Tidak ada presensi gagal.</div>';
+  } else {
+    gagal.innerHTML =
+      rfidDaftarGagal.map(item => {
+        return (
+          '<div class="scan-detail-item danger">' +
+            '<div class="scan-detail-main">' +
+              '<div class="scan-detail-name">' +
+                escapeHtml(item.nama || ("UID " + item.uid)) +
+              '</div>' +
+              '<div class="scan-detail-meta">' +
+                (item.kelas
+                  ? "Kelas " + escapeHtml(item.kelas) + " • "
+                  : "") +
+                escapeHtml(item.pesan || "Gagal diproses.") +
+              '</div>' +
+              '<button class="scan-retry-btn retry-rfid" ' +
+                'type="button" data-uid="' + escapeHtml(item.uid) + '">' +
+                'COBA LAGI' +
+              '</button>' +
+            '</div>' +
+          '</div>'
+        );
+      }).join("");
+  }
+}
+
+
+function hapusGagalRFID(uid) {
+  uid = normalisasiUidRFID(uid);
+
+  rfidDaftarGagal =
+    rfidDaftarGagal.filter(item => item.uid !== uid);
+
+  perbaruiStatRFID();
+  perbaruiDetailRFID();
+}
+
+
+function catatGagalRFID(item, pesan) {
+  const uid =
+    normalisasiUidRFID(item && item.uid);
+
+  if (!uid) return;
+
+  rfidDaftarGagal =
+    rfidDaftarGagal.filter(x => x.uid !== uid);
+
+  rfidDaftarGagal.unshift({
+    uid: uid,
+    nama: item && item.nama ? item.nama : "",
+    kelas: item && item.kelas ? item.kelas : "",
+    pesan: pesan || "Gagal diproses.",
+    waktuGagal: Date.now()
+  });
+
+  perbaruiStatRFID();
+  perbaruiDetailRFID();
+}
+
+
+async function aktifkanRFID() {
+  rfidAktif = true;
+  fokusRFID();
+
+  const status =
+    document.getElementById("statusRFID");
+
+  if (!kegiatanAktif) {
+    if (status) {
+      status.textContent =
+        "Tidak ada kegiatan aktif. Tap kartu belum dapat digunakan.";
+    }
+
+    tampilToastQR(
+      "warning",
+      "Tidak ada kegiatan",
+      "Tap kartu belum dapat digunakan.",
+      "RFID-NO-ACTIVITY"
+    );
+
+    return;
+  }
+
+  if (status) {
+    status.textContent =
+      "Memuat data kartu...";
+  }
+
+  const d = await post({
+    action: "rfidMeta",
+    token: token,
+    kegiatan: kegiatanAktif
+  });
+
+  if (cekLoginHabis(d)) return;
+
+  if (!d || !d.berhasil) {
+    if (status) {
+      status.textContent =
+        d && d.pesan
+          ? d.pesan
+          : "Data kartu gagal dimuat.";
+    }
+
+    tampilToastQR(
+      "error",
+      "Tap kartu belum siap",
+      d && d.pesan
+        ? d.pesan
+        : "Data kartu gagal dimuat.",
+      "RFID-META"
+    );
+
+    fokusRFID();
+    return;
+  }
+
+  rfidMapping = {};
+  rfidSudahAbsen = new Set();
+
+  (d.data || []).forEach(siswa => {
+    const uid =
+      normalisasiUidRFID(siswa.uid);
+
+    if (!uid) return;
+
+    rfidMapping[uid] = {
+      id: siswa.id || "",
+      uid: uid,
+      nama: siswa.nama || "",
+      kelas: siswa.kelas || "",
+      jk: siswa.jk || ""
+    };
+
+    if (siswa.sudahAbsen) {
+      rfidSudahAbsen.add(uid);
+    }
+  });
+
+  const jumlah =
+    Object.keys(rfidMapping).length;
+
+  if (status) {
+    status.textContent =
+      jumlah +
+      " kartu siap • Tempelkan kartu siswa.";
+  }
+
+  perbaruiStatRFID();
+  perbaruiDetailRFID();
+  fokusRFID();
+}
+
+
+function masukkanKeAntreanRFID(uid, opsi = {}) {
+  uid =
+    normalisasiUidRFID(uid);
+
+  if (!uid || !rfidAktif) return;
+
+  if (
+    rfidUidDiproses.has(uid) ||
+    (rfidSedangDiproses && rfidSedangDiproses.uid === uid) ||
+    rfidAntrean.some(item => item.uid === uid)
+  ) {
+    fokusRFID();
+    return;
+  }
+
+  const siswa =
+    rfidMapping[uid] || {
+      id: "",
+      uid: uid,
+      nama: "",
+      kelas: "",
+      jk: ""
+    };
+
+  if (opsi.hitungTerbaca !== false) {
+    rfidTotalTap++;
+
+    bunyiTerbaca();
+
+    if (navigator.vibrate) {
+      navigator.vibrate(45);
+    }
+  }
+
+  hapusGagalRFID(uid);
+  rfidUidDiproses.add(uid);
+
+  rfidAntrean.push({
+    uid: uid,
+    id: siswa.id || "",
+    nama: siswa.nama || "",
+    kelas: siswa.kelas || "",
+    kegiatan: kegiatanAktif,
+    token: token,
+    waktuMasuk: Date.now(),
+    waktuMulaiProses: null,
+    percobaanUlang:
+      opsi.percobaanUlang === true
+  });
+
+  const status =
+    document.getElementById("statusRFID");
+
+  if (status) {
+    status.textContent =
+      opsi.percobaanUlang
+        ? "🔄 Mengirim ulang presensi yang gagal..."
+        : "⚡ Kartu terbaca. Siswa berikutnya silakan maju.";
+  }
+
+  perbaruiStatRFID();
+  perbaruiDetailRFID();
+  jalankanAntreanRFID();
+  fokusRFID();
+}
+
+
+function terimaTapRFID(uidMentah) {
+  masukkanKeAntreanRFID(
+    uidMentah,
+    {
+      hitungTerbaca: true,
+      percobaanUlang: false
+    }
+  );
+}
+
+
+function cobaKirimUlangRFID(uid) {
+  uid =
+    normalisasiUidRFID(uid);
+
+  if (!uid || !rfidAktif) return;
+
+  rfidUidDiproses.delete(uid);
+
+  masukkanKeAntreanRFID(
+    uid,
+    {
+      hitungTerbaca: false,
+      percobaanUlang: true
+    }
+  );
+}
+
+
+async function kirimPresensiRFID(item) {
+  const controller =
+    typeof AbortController !== "undefined"
+      ? new AbortController()
+      : null;
+
+  let timer = null;
+
+  if (controller) {
+    timer =
+      setTimeout(
+        () => controller.abort(),
+        RFID_TIMEOUT_MS
+      );
+  }
+
+  try {
+    const response =
+      await fetch(
+        API,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=UTF-8"
+          },
+          body: JSON.stringify({
+            action: "catatPresensiRFID",
+            uid: item.uid,
+            kegiatan: item.kegiatan,
+            token: item.token
+          }),
+          signal:
+            controller
+              ? controller.signal
+              : undefined
+        }
+      );
+
+    return await response.json();
+
+  } catch (error) {
+    return {
+      berhasil: false,
+      gagalKoneksi: true,
+      pesan:
+        error && error.name === "AbortError"
+          ? "Server terlalu lama merespons. Tap ulang kartu ini setelah antrean berjalan."
+          : "Tidak dapat terhubung ke server. Tap ulang kartu ini."
+    };
+
+  } finally {
+    if (timer) {
+      clearTimeout(timer);
+    }
+  }
+}
+
+
+function tampilHasilRFID(d, item) {
+  if (cekLoginHabis(d)) return;
+
+  const uid =
+    normalisasiUidRFID(item && item.uid);
+
+  const nama =
+    (d && d.nama) ||
+    (item && item.nama) ||
+    "Siswa";
+
+  const kelas =
+    (d && d.kelas) ||
+    (item && item.kelas) ||
+    "-";
+
+  if (d && d.berhasil) {
+    rfidTotalTersimpan++;
+    rfidSudahAbsen.add(uid);
+    hapusGagalRFID(uid);
+
+    tampilToastQR(
+      "success",
+      "Tersimpan",
+      nama +
+      " • Kelas " + kelas +
+      " • " + (d.status || "Tercatat"),
+      "RFID-" + uid
+    );
+
+  } else if (d && d.sudahAbsen) {
+    rfidSudahAbsen.add(uid);
+    hapusGagalRFID(uid);
+
+    tampilToastQR(
+      "warning",
+      "Sudah absen",
+      nama +
+      (d.jamSebelumnya
+        ? " • Tercatat pukul " + d.jamSebelumnya
+        : " • Presensi sudah tercatat"),
+      "RFID-" + uid
+    );
+
+    bunyiPeringatan();
+
+    if (navigator.vibrate) {
+      navigator.vibrate([70, 60, 70]);
+    }
+
+  } else {
+    const pesan =
+      d && d.pesan
+        ? d.pesan
+        : "Kartu tidak terdaftar atau presensi gagal.";
+
+    catatGagalRFID(
+      item || { uid: uid },
+      pesan
+    );
+
+    tampilToastQR(
+      "error",
+      "Presensi gagal",
+      pesan,
+      "RFID-" + uid
+    );
+
+    bunyiPeringatan();
+
+    if (navigator.vibrate) {
+      navigator.vibrate([120, 80, 120]);
+    }
+  }
+
+  perbaruiStatRFID();
+  perbaruiDetailRFID();
+}
+
+
+async function jalankanAntreanRFID() {
+  if (rfidPekerjaAktif) return;
+
+  rfidPekerjaAktif = true;
+
+  try {
+    while (rfidAntrean.length > 0) {
+      rfidSedangDiproses =
+        rfidAntrean.shift();
+
+      rfidSedangDiproses.waktuMulaiProses =
+        Date.now();
+
+      perbaruiStatRFID();
+      perbaruiDetailRFID();
+
+      const item =
+        rfidSedangDiproses;
+
+      const d =
+        await kirimPresensiRFID(item);
+
+      tampilHasilRFID(
+        d,
+        item
+      );
+
+      rfidUidDiproses.delete(item.uid);
+      rfidSedangDiproses = null;
+
+      perbaruiStatRFID();
+      perbaruiDetailRFID();
+      fokusRFID();
+    }
+
+  } finally {
+    if (rfidSedangDiproses) {
+      rfidUidDiproses.delete(
+        rfidSedangDiproses.uid
+      );
+    }
+
+    rfidSedangDiproses = null;
+    rfidPekerjaAktif = false;
+    perbaruiStatRFID();
+    perbaruiDetailRFID();
+    fokusRFID();
+  }
+}
+
+
+const inputRFID =
+  document.getElementById("rfidInput");
+
+inputRFID.addEventListener("keydown", event => {
+  if (event.key !== "Enter") return;
+
+  event.preventDefault();
+
+  const uid =
+    inputRFID.value.trim();
+
+  inputRFID.value = "";
+
+  terimaTapRFID(uid);
+});
+
+
+inputRFID.addEventListener("blur", () => {
+  if (rfidAktif) fokusRFID();
+});
+
+
+document.getElementById("toggleDetailRFID").onclick =
+function() {
+  rfidDetailTerbuka =
+    !rfidDetailTerbuka;
+
+  document.getElementById("detailRFIDBody").style.display =
+    rfidDetailTerbuka ? "block" : "none";
+
+  this.textContent =
+    rfidDetailTerbuka ? "TUTUP" : "BUKA";
+};
+
+
+document.getElementById("detailRFIDGagal").addEventListener(
+  "click",
+  event => {
+    const tombol =
+      event.target.closest(".retry-rfid");
+
+    if (!tombol) return;
+
+    const uid =
+      tombol.getAttribute("data-uid") || "";
+
+    cobaKirimUlangRFID(uid);
+  }
+);
+
+
+setInterval(
+  perbaruiDetailRFID,
+  1000
+);
+
+
+document.addEventListener("click", () => {
+  if (rfidAktif) fokusRFID();
+});
+
+
+window.addEventListener("focus", () => {
+  if (rfidAktif) fokusRFID();
+});
+
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && rfidAktif) {
+    fokusRFID();
+  }
+});
+
+
+
+
 /* QR - MODE SCAN KILAT */
 
 /*
@@ -1879,7 +2866,7 @@ function() {
   2. Setiap QR unik langsung masuk antrean lokal.
   3. Presensi dikirim ke Apps Script satu per satu di belakang layar.
   4. Anti-double utama tetap ditentukan backend.
-  5. QR yang sama dikunci secara lokal selama sesi agar tidak memenuhi antrean.
+  5. QR yang sama hanya dikunci saat sedang antre/diproses; setelah selesai boleh discan ulang untuk mengecek anti-double backend.
 */
 
 const scanner =
@@ -1917,9 +2904,10 @@ new QrScanner(
     jadwalkanResetQR(idQR);
 
     /*
-      Jika ID ini sudah pernah diterima dalam sesi halaman ini,
-      jangan masukkan lagi. Backend tetap menjadi pengaman final.
-      Jika request benar-benar gagal, kunci ini dilepas agar bisa discan ulang.
+      Jika ID ini sedang antre atau sedang diproses, jangan masukkan lagi.
+      Setelah server selesai memberi jawaban, kunci lokal dilepas.
+      Jadi QR yang sudah pergi dari kamera dapat discan ulang dan backend
+      akan menampilkan status "Sudah absen" bila memang sudah tercatat.
     */
     if (idTerkunciSesi.has(idQR)) {
       return;
@@ -2494,15 +3482,12 @@ async function jalankanAntrean() {
       tampilQR(d, idSelesai, itemSelesai);
 
       /*
-        Jika gagal sungguhan, ID dilepas supaya guru bisa scan ulang.
-        Jika berhasil / sudah absen, tetap dikunci selama sesi halaman ini.
+        Kunci lokal hanya berlaku selama QR sedang antre/diproses.
+        Setelah server selesai menjawab, ID selalu dilepas.
+        Pengaman qrTerakhir tetap mencegah spam selama kartu masih
+        terus terlihat kamera.
       */
-      if (
-        !d ||
-        (!d.berhasil && !d.sudahAbsen)
-      ) {
-        idTerkunciSesi.delete(idSelesai);
-      }
+      idTerkunciSesi.delete(idSelesai);
 
       itemSedangDiproses = null;
       perbaruiStatScan();
@@ -2965,7 +3950,7 @@ function tampilQR(d, idQR, itemSelesai = null) {
 window.addEventListener(
   "beforeunload",
   event => {
-    if (jumlahBelumSinkron() > 0) {
+    if (jumlahBelumSinkronSemua() > 0) {
       event.preventDefault();
       event.returnValue = "";
     }
