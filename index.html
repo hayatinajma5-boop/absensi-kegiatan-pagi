@@ -1859,14 +1859,15 @@ let rfidAktif = false;
 let rfidMapping = {};
 let rfidSudahAbsen = new Set();
 let rfidAntrean = [];
-let rfidPekerjaAktif = false;
-let rfidSedangDiproses = null;
+let rfidPekerjaAktif = 0;
+let rfidSedangDiproses = new Map();
 let rfidUidDiproses = new Set();
 let rfidDaftarGagal = [];
 let rfidTotalTap = 0;
 let rfidTotalTersimpan = 0;
 let rfidDetailTerbuka = true;
 const RFID_TIMEOUT_MS = 15000;
+const RFID_MAX_PEKERJA = 2; // dua request paralel: lebih cepat, tetap aman oleh ScriptLock backend
 
 
 /* UTIL */
@@ -2263,7 +2264,7 @@ function fokusRFID() {
 function jumlahBelumSinkronRFID() {
   return (
     rfidAntrean.length +
-    (rfidSedangDiproses ? 1 : 0)
+    rfidSedangDiproses.size
   );
 }
 
@@ -2320,8 +2321,11 @@ function perbaruiDetailRFID() {
   body.style.display =
     rfidDetailTerbuka ? "block" : "none";
 
+  const daftarSedangDiproses =
+    Array.from(rfidSedangDiproses.values());
+
   badgeProses.textContent =
-    rfidSedangDiproses ? "1" : "0";
+    String(daftarSedangDiproses.length);
 
   badgeMenunggu.textContent =
     String(rfidAntrean.length);
@@ -2329,30 +2333,35 @@ function perbaruiDetailRFID() {
   badgeGagal.textContent =
     String(rfidDaftarGagal.length);
 
-  if (rfidSedangDiproses) {
-    const durasi =
-      Date.now() -
-      (rfidSedangDiproses.waktuMulaiProses ||
-       rfidSedangDiproses.waktuMasuk ||
-       Date.now());
-
-    proses.className =
-      "scan-detail-item " + kelasDurasi(durasi, "proses");
+  if (daftarSedangDiproses.length > 0) {
+    proses.className = "scan-detail-list";
 
     proses.innerHTML =
-      '<div class="scan-detail-main">' +
-        '<div class="scan-detail-name">' +
-          escapeHtml(rfidSedangDiproses.nama || ("UID " + rfidSedangDiproses.uid)) +
-        '</div>' +
-        '<div class="scan-detail-meta">' +
-          (rfidSedangDiproses.kelas
-            ? "Kelas " + escapeHtml(rfidSedangDiproses.kelas)
-            : "Kartu sedang dikirim ke server") +
-        '</div>' +
-      '</div>' +
-      '<div class="scan-detail-time">' +
-        escapeHtml(labelDurasi(durasi, "proses")) +
-      '</div>';
+      daftarSedangDiproses.map(item => {
+        const durasi =
+          Date.now() -
+          (item.waktuMulaiProses ||
+           item.waktuMasuk ||
+           Date.now());
+
+        return (
+          '<div class="scan-detail-item ' + kelasDurasi(durasi, "proses") + '">' +
+            '<div class="scan-detail-main">' +
+              '<div class="scan-detail-name">' +
+                escapeHtml(item.nama || ("UID " + item.uid)) +
+              '</div>' +
+              '<div class="scan-detail-meta">' +
+                (item.kelas
+                  ? "Kelas " + escapeHtml(item.kelas)
+                  : "Kartu sedang dikirim ke server") +
+              '</div>' +
+            '</div>' +
+            '<div class="scan-detail-time">' +
+              escapeHtml(labelDurasi(durasi, "proses")) +
+            '</div>' +
+          '</div>'
+        );
+      }).join("");
 
   } else {
     proses.className = "scan-detail-empty";
@@ -2557,7 +2566,6 @@ function masukkanKeAntreanRFID(uid, opsi = {}) {
 
   if (
     rfidUidDiproses.has(uid) ||
-    (rfidSedangDiproses && rfidSedangDiproses.uid === uid) ||
     rfidAntrean.some(item => item.uid === uid)
   ) {
     fokusRFID();
@@ -2783,24 +2791,27 @@ function tampilHasilRFID(d, item) {
 }
 
 
-async function jalankanAntreanRFID() {
-  if (rfidPekerjaAktif) return;
+async function pekerjaAntreanRFID() {
+  rfidPekerjaAktif++;
 
-  rfidPekerjaAktif = true;
+  let item = null;
 
   try {
     while (rfidAntrean.length > 0) {
-      rfidSedangDiproses =
-        rfidAntrean.shift();
+      item = rfidAntrean.shift();
 
-      rfidSedangDiproses.waktuMulaiProses =
+      if (!item) break;
+
+      item.waktuMulaiProses =
         Date.now();
+
+      rfidSedangDiproses.set(
+        item.uid,
+        item
+      );
 
       perbaruiStatRFID();
       perbaruiDetailRFID();
-
-      const item =
-        rfidSedangDiproses;
 
       const d =
         await kirimPresensiRFID(item);
@@ -2811,7 +2822,8 @@ async function jalankanAntreanRFID() {
       );
 
       rfidUidDiproses.delete(item.uid);
-      rfidSedangDiproses = null;
+      rfidSedangDiproses.delete(item.uid);
+      item = null;
 
       perbaruiStatRFID();
       perbaruiDetailRFID();
@@ -2819,17 +2831,42 @@ async function jalankanAntreanRFID() {
     }
 
   } finally {
-    if (rfidSedangDiproses) {
-      rfidUidDiproses.delete(
-        rfidSedangDiproses.uid
-      );
+    if (item) {
+      rfidUidDiproses.delete(item.uid);
+      rfidSedangDiproses.delete(item.uid);
     }
 
-    rfidSedangDiproses = null;
-    rfidPekerjaAktif = false;
+    rfidPekerjaAktif =
+      Math.max(0, rfidPekerjaAktif - 1);
+
     perbaruiStatRFID();
     perbaruiDetailRFID();
     fokusRFID();
+
+    /*
+     * Jika kartu masuk tepat saat worker selesai,
+     * pastikan antrean langsung dilanjutkan.
+     */
+    if (rfidAntrean.length > 0) {
+      jalankanAntreanRFID();
+    }
+  }
+}
+
+
+function jalankanAntreanRFID() {
+  /*
+   * Optimasi produksi RFID:
+   * maksimal dua request berjalan bersamaan.
+   * Backend tetap memakai ScriptLock pada bagian kritis
+   * cek anti-double -> tulis PRESENSI -> update cache,
+   * jadi QR/RFID dan multi-device tetap aman.
+   */
+  while (
+    rfidPekerjaAktif < RFID_MAX_PEKERJA &&
+    rfidAntrean.length > 0
+  ) {
+    pekerjaAntreanRFID();
   }
 }
 
