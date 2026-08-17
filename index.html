@@ -87,6 +87,26 @@ button.logout {
   font-size: 13px;
 }
 
+.petugas-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+button.refresh-app {
+  width: auto;
+  margin: 0;
+  padding: 8px 10px;
+  background: #e8f5e9;
+  color: #1b5e20;
+  border: 1px solid #c8e6c9;
+  font-size: 13px;
+}
+
+button.refresh-app:active {
+  transform: scale(.97);
+}
+
 button.haid-action {
   background: #ad1457;
   color: white;
@@ -1341,7 +1361,10 @@ video {
         <b id="namaPetugas"></b>
       </div>
 
-      <button id="logout" class="logout">Keluar</button>
+      <div class="petugas-actions">
+        <button id="refreshApp" class="refresh-app" type="button">↻ Refresh</button>
+        <button id="logout" class="logout" type="button">Keluar</button>
+      </div>
     </div>
 
     <div class="card jadwal">
@@ -1986,6 +2009,36 @@ function bukaApp() {
 if (token && namaGuru) {
   bukaApp();
 }
+
+
+/* REFRESH APLIKASI */
+document.getElementById("refreshApp").onclick =
+function() {
+
+  const pending = jumlahBelumSinkronSemua();
+
+  if (pending > 0) {
+    alert(
+      "Masih ada " + pending +
+      " presensi QR/RFID yang sedang disimpan. Tunggu sampai antrean selesai sebelum refresh."
+    );
+    return;
+  }
+
+  /*
+   * Login tidak dihapus.
+   * Jadi setelah refresh, petugas tetap masuk selama sesi backend masih valid.
+   */
+  scannerAktif = false;
+
+  try {
+    scanner.stop();
+  } catch (error) {}
+
+  rfidAktif = false;
+
+  location.reload();
+};
 
 
 /* LOGOUT */
