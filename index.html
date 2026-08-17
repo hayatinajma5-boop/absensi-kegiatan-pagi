@@ -1493,6 +1493,13 @@ button.login-method-tab.active {
         <div class="login-method-hint">Arahkan kamera ke <b>QR Guru</b>. QR siswa tidak dapat dipakai untuk login petugas.</div>
         <div class="login-qr-box">
           <video id="loginQrVideo" playsinline muted></video>
+          <button
+            id="flipLoginCamera"
+            class="flip-camera"
+            type="button"
+            aria-label="Balik kamera login"
+            title="Balik kamera"
+          >🔄</button>
         </div>
         <button id="mulaiLoginQR" type="button">📷 MULAI SCAN QR GURU</button>
         <div id="statusLoginQR" class="login-status">Kamera belum dinyalakan.</div>
@@ -2015,6 +2022,8 @@ let loginQrAktif = false;
 let loginQrMemproses = false;
 let loginQrTerakhir = "";
 let loginQrResetTimer = null;
+let loginKameraDepan = false;
+let loginSedangGantiKamera = false;
 let loginRfidAktif = false;
 let loginRfidMemproses = false;
 
@@ -2116,6 +2125,13 @@ function simpanLoginBerhasil(d) {
   loginQrAktif = false;
   loginQrMemproses = false;
 
+  const flipLogin =
+    document.getElementById("flipLoginCamera");
+
+  if (flipLogin) {
+    flipLogin.classList.remove("show");
+  }
+
   try {
     if (loginQrScanner) {
       loginQrScanner.stop();
@@ -2166,6 +2182,16 @@ function fokusLoginRFID() {
 
 async function hentikanLoginQR() {
   loginQrAktif = false;
+
+  const flipLogin =
+    document.getElementById("flipLoginCamera");
+
+  if (flipLogin) {
+    flipLogin.classList.remove("show");
+    flipLogin.disabled = false;
+  }
+
+  loginSedangGantiKamera = false;
 
   try {
     if (loginQrScanner) {
@@ -2219,6 +2245,14 @@ async function aktifkanLoginQR() {
     await loginQrScanner.start();
     loginQrAktif = true;
 
+    const flipLogin =
+      document.getElementById("flipLoginCamera");
+
+    if (flipLogin) {
+      flipLogin.classList.add("show");
+      flipLogin.disabled = false;
+    }
+
     if (tombol) {
       tombol.textContent =
         "⏹ HENTIKAN SCAN";
@@ -2231,6 +2265,14 @@ async function aktifkanLoginQR() {
 
   } catch (error) {
     loginQrAktif = false;
+
+    const flipLogin =
+      document.getElementById("flipLoginCamera");
+
+    if (flipLogin) {
+      flipLogin.classList.remove("show");
+      flipLogin.disabled = false;
+    }
 
     if (tombol) {
       tombol.textContent =
@@ -2498,6 +2540,86 @@ new QrScanner(
     returnDetailedScanResult: true
   }
 );
+
+
+/* FLIP KAMERA KHUSUS LOGIN QR GURU */
+document.getElementById("flipLoginCamera").onclick =
+async function() {
+
+  if (
+    !loginQrAktif ||
+    loginSedangGantiKamera ||
+    loginQrMemproses
+  ) {
+    return;
+  }
+
+  loginSedangGantiKamera = true;
+  this.disabled = true;
+
+  const target =
+    loginKameraDepan
+      ? "environment"
+      : "user";
+
+  const status =
+    document.getElementById("statusLoginQR");
+
+  if (status) {
+    status.className = "login-status";
+    status.textContent =
+      target === "user"
+        ? "Mengganti ke kamera depan..."
+        : "Mengganti ke kamera belakang...";
+  }
+
+  try {
+
+    await loginQrScanner.setCamera(target);
+
+    loginKameraDepan =
+      target === "user";
+
+    this.setAttribute(
+      "aria-label",
+      loginKameraDepan
+        ? "Gunakan kamera belakang untuk login"
+        : "Gunakan kamera depan untuk login"
+    );
+
+    this.title =
+      loginKameraDepan
+        ? "Gunakan kamera belakang"
+        : "Gunakan kamera depan";
+
+    loginQrTerakhir = "";
+
+    if (loginQrResetTimer) {
+      clearTimeout(loginQrResetTimer);
+      loginQrResetTimer = null;
+    }
+
+    if (status) {
+      status.className = "login-status";
+      status.textContent =
+        loginKameraDepan
+          ? "Kamera depan aktif. Arahkan ke QR guru."
+          : "Kamera belakang aktif. Arahkan ke QR guru.";
+    }
+
+  } catch (error) {
+
+    if (status) {
+      status.className = "login-status error";
+      status.textContent =
+        "Kamera tidak dapat diganti pada perangkat ini.";
+    }
+
+  } finally {
+    loginSedangGantiKamera = false;
+    this.disabled = false;
+  }
+};
 
 
 document.getElementById("tabLoginManual").onclick =
