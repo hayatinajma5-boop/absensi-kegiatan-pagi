@@ -1136,6 +1136,138 @@ video {
 }
 
 
+/* =====================================================
+   LOGIN PETUGAS — 3 METODE
+   Nama + PIN / Scan QR Guru / Tap Kartu Guru
+===================================================== */
+.login-method-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 14px 0 16px;
+}
+
+button.login-method-tab {
+  margin: 0;
+  min-height: 50px;
+  padding: 9px 7px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f4f7f5 !important;
+  color: #36544a !important;
+  box-shadow: none !important;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+button.login-method-tab.active {
+  border-color: #9fcfbd;
+  background: #e8f5ef !important;
+  color: var(--primary-dark) !important;
+  box-shadow: inset 0 0 0 1px rgba(15,95,70,.04) !important;
+}
+
+.login-method-panel {
+  display: none;
+}
+
+.login-method-panel.active {
+  display: block;
+}
+
+.login-method-hint {
+  margin: 0 0 12px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f8fbf9;
+  color: #49635a;
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.login-qr-box {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-height: 210px;
+  border-radius: 14px;
+  background: #12231d;
+  border: 1px solid #d7e6df;
+  margin-bottom: 10px;
+}
+
+#loginQrVideo {
+  display: block;
+  width: 100%;
+  height: 230px;
+  object-fit: cover;
+  background: #12231d;
+}
+
+.login-rfid-reader {
+  min-height: 225px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 22px 14px;
+  border: 2px dashed #7cb8a4;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fbfdfc, #f3f8f5);
+}
+
+.login-rfid-icon {
+  font-size: 52px;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.login-status {
+  min-height: 21px;
+  margin-top: 9px;
+  text-align: center;
+  font-size: 13px;
+  color: #49635a;
+}
+
+.login-status.error {
+  color: #b42318;
+}
+
+.login-status.success {
+  color: var(--primary-dark);
+}
+
+#loginRfidInput {
+  position: fixed;
+  left: -9999px;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  opacity: .01;
+  pointer-events: none;
+}
+
+@media (max-width: 420px) {
+  .login-method-tabs {
+    gap: 6px;
+  }
+
+  button.login-method-tab {
+    font-size: 11px;
+    padding: 8px 5px;
+  }
+
+  #loginQrVideo {
+    height: 210px;
+  }
+}
+
+
 
 /* =====================================================
    RFID PRODUKSI — MODE TAP KILAT
@@ -1327,28 +1459,64 @@ video {
       </div>
       <h3 class="center sukses">LOGIN PETUGAS</h3>
 
-      <div id="loadingGuru">Memuat daftar guru...</div>
+      <div class="login-method-tabs" role="tablist" aria-label="Metode login petugas">
+        <button id="tabLoginManual" class="login-method-tab active" type="button">🔢 Nama + PIN</button>
+        <button id="tabLoginQR" class="login-method-tab" type="button">📷 Scan QR</button>
+        <button id="tabLoginRFID" class="login-method-tab" type="button">💳 Tap Kartu</button>
+      </div>
 
-      <div id="formLogin" style="display:none;">
-        <label>Nama Guru</label>
+      <div id="loginManualPanel" class="login-method-panel active">
+        <div id="loadingGuru">Memuat daftar guru...</div>
 
-        <select id="guru">
-          <option value="">-- Pilih nama guru --</option>
-        </select>
+        <div id="formLogin" style="display:none;">
+          <label>Nama Guru</label>
 
-        <label>PIN</label>
+          <select id="guru">
+            <option value="">-- Pilih nama guru --</option>
+          </select>
 
+          <label>PIN</label>
+
+          <input
+            id="pin"
+            type="password"
+            inputmode="numeric"
+            maxlength="4"
+            placeholder="••••"
+          >
+
+          <button id="login">MASUK</button>
+        </div>
+      </div>
+
+      <div id="loginQRPanel" class="login-method-panel">
+        <div class="login-method-hint">Arahkan kamera ke <b>QR Guru</b>. QR siswa tidak dapat dipakai untuk login petugas.</div>
+        <div class="login-qr-box">
+          <video id="loginQrVideo" playsinline muted></video>
+        </div>
+        <button id="mulaiLoginQR" type="button">📷 MULAI SCAN QR GURU</button>
+        <div id="statusLoginQR" class="login-status">Kamera belum dinyalakan.</div>
+      </div>
+
+      <div id="loginRFIDPanel" class="login-method-panel">
         <input
-          id="pin"
-          type="password"
-          inputmode="numeric"
-          maxlength="4"
-          placeholder="••••"
+          id="loginRfidInput"
+          type="text"
+          inputmode="none"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+          aria-label="Input kartu guru"
         >
 
-        <button id="login">MASUK</button>
-        <div id="pesanLogin" class="center error"></div>
+        <div class="login-rfid-reader">
+          <div class="login-rfid-icon">💳</div>
+          <b>Tempelkan kartu guru</b>
+          <div id="statusLoginRFID" class="login-status">Reader siap. Tap satu kartu guru.</div>
+        </div>
       </div>
+
+      <div id="pesanLogin" class="center error" style="margin-top:10px;"></div>
     </div>
   </div>
 
@@ -1828,8 +1996,8 @@ let totalScan = 0;
 let totalTerbaca = 0;
 let totalGagal = 0;
 let antrianQR = [];
-let pekerjaAntrianAktif = false;
-let itemSedangDiproses = null;
+let qrPekerjaAktif = 0;
+let qrSedangDiproses = new Map();
 let daftarGagalScan = [];
 let detailScanTerbuka = true;
 const idTerkunciSesi = new Set();
@@ -1838,6 +2006,17 @@ const BATAS_PROSES_LAMBAT_MS = 8000;
 const BATAS_PROSES_SANGAT_LAMBAT_MS = 12000;
 const BATAS_TUNGGU_LAMA_MS = 30000;
 const BATAS_TUNGGU_SANGAT_LAMA_MS = 90000;
+const QR_MAX_PEKERJA = 2; // dua request QR paralel; backend tetap mengamankan tulis via ScriptLock
+
+// LOGIN 3 METODE
+let metodeLoginAktif = "MANUAL";
+let loginQrScanner = null;
+let loginQrAktif = false;
+let loginQrMemproses = false;
+let loginQrTerakhir = "";
+let loginQrResetTimer = null;
+let loginRfidAktif = false;
+let loginRfidMemproses = false;
 
 // Optimasi scanner QR
 let qrTerakhir = "";
@@ -1919,6 +2098,330 @@ document.getElementById("tanggal").textContent =
 
 
 /* LOGIN */
+function simpanLoginBerhasil(d) {
+  token = d.token;
+  namaGuru = d.guru.nama;
+
+  localStorage.setItem("absensi_token", token);
+  localStorage.setItem("absensi_guru", namaGuru);
+
+  loginRfidAktif = false;
+  loginRfidMemproses = false;
+
+  if (loginQrResetTimer) {
+    clearTimeout(loginQrResetTimer);
+    loginQrResetTimer = null;
+  }
+
+  loginQrAktif = false;
+  loginQrMemproses = false;
+
+  try {
+    if (loginQrScanner) {
+      loginQrScanner.stop();
+    }
+  } catch (error) {}
+
+  bukaApp();
+}
+
+
+function setPesanLogin(pesan = "") {
+  const el = document.getElementById("pesanLogin");
+  if (el) el.textContent = pesan;
+}
+
+
+function fokusLoginRFID() {
+  if (
+    metodeLoginAktif !== "RFID" ||
+    !loginRfidAktif ||
+    token
+  ) {
+    return;
+  }
+
+  setTimeout(() => {
+    if (
+      metodeLoginAktif !== "RFID" ||
+      !loginRfidAktif ||
+      token
+    ) {
+      return;
+    }
+
+    const input =
+      document.getElementById("loginRfidInput");
+
+    if (!input) return;
+
+    try {
+      input.focus({ preventScroll: true });
+    } catch {
+      input.focus();
+    }
+  }, 40);
+}
+
+
+async function hentikanLoginQR() {
+  loginQrAktif = false;
+
+  try {
+    if (loginQrScanner) {
+      await loginQrScanner.stop();
+    }
+  } catch (error) {}
+
+  const tombol =
+    document.getElementById("mulaiLoginQR");
+
+  if (tombol) {
+    tombol.textContent =
+      "📷 MULAI SCAN QR GURU";
+  }
+}
+
+
+async function aktifkanLoginQR() {
+  if (
+    metodeLoginAktif !== "QR" ||
+    loginQrMemproses ||
+    token
+  ) {
+    return;
+  }
+
+  const status =
+    document.getElementById("statusLoginQR");
+
+  const tombol =
+    document.getElementById("mulaiLoginQR");
+
+  if (loginQrAktif) {
+    await hentikanLoginQR();
+
+    if (status) {
+      status.textContent =
+        "Scanner dihentikan.";
+    }
+
+    return;
+  }
+
+  try {
+    if (status) {
+      status.className = "login-status";
+      status.textContent =
+        "Menyalakan kamera...";
+    }
+
+    await loginQrScanner.start();
+    loginQrAktif = true;
+
+    if (tombol) {
+      tombol.textContent =
+        "⏹ HENTIKAN SCAN";
+    }
+
+    if (status) {
+      status.textContent =
+        "Kamera aktif. Arahkan ke QR guru.";
+    }
+
+  } catch (error) {
+    loginQrAktif = false;
+
+    if (tombol) {
+      tombol.textContent =
+        "📷 COBA NYALAKAN KAMERA";
+    }
+
+    if (status) {
+      status.className =
+        "login-status error";
+      status.textContent =
+        "Kamera tidak dapat dinyalakan. Periksa izin kamera.";
+    }
+  }
+}
+
+
+async function prosesLoginQR(qrKey) {
+  qrKey = String(qrKey || "").trim();
+
+  if (
+    !qrKey ||
+    loginQrMemproses ||
+    metodeLoginAktif !== "QR"
+  ) {
+    return;
+  }
+
+  loginQrMemproses = true;
+  setPesanLogin("");
+
+  const status =
+    document.getElementById("statusLoginQR");
+
+  if (status) {
+    status.className = "login-status";
+    status.textContent =
+      "Memverifikasi QR guru...";
+  }
+
+  try {
+    const d = await post({
+      action: "loginGuruQR",
+      qrKey: qrKey
+    });
+
+    if (d && d.berhasil) {
+      if (status) {
+        status.className =
+          "login-status success";
+        status.textContent =
+          "Login berhasil.";
+      }
+
+      simpanLoginBerhasil(d);
+      return;
+    }
+
+    const pesan =
+      d && d.pesan
+        ? d.pesan
+        : "QR guru tidak dapat digunakan.";
+
+    if (status) {
+      status.className =
+        "login-status error";
+      status.textContent = pesan;
+    }
+
+    setPesanLogin(pesan);
+
+  } finally {
+    loginQrMemproses = false;
+  }
+}
+
+
+async function prosesLoginRFID(uid) {
+  uid = normalisasiUidRFID(uid);
+
+  if (
+    !uid ||
+    loginRfidMemproses ||
+    metodeLoginAktif !== "RFID"
+  ) {
+    fokusLoginRFID();
+    return;
+  }
+
+  loginRfidMemproses = true;
+  setPesanLogin("");
+
+  const status =
+    document.getElementById("statusLoginRFID");
+
+  if (status) {
+    status.className = "login-status";
+    status.textContent =
+      "Memverifikasi kartu guru...";
+  }
+
+  const d = await post({
+    action: "loginGuruRFID",
+    uid: uid
+  });
+
+  if (d && d.berhasil) {
+    if (status) {
+      status.className =
+        "login-status success";
+      status.textContent =
+        "Login berhasil.";
+    }
+
+    simpanLoginBerhasil(d);
+    return;
+  }
+
+  const pesan =
+    d && d.pesan
+      ? d.pesan
+      : "Kartu guru tidak dapat digunakan.";
+
+  if (status) {
+    status.className =
+      "login-status error";
+    status.textContent = pesan;
+  }
+
+  setPesanLogin(pesan);
+  loginRfidMemproses = false;
+  fokusLoginRFID();
+}
+
+
+function pilihMetodeLogin(metode) {
+  metode = String(metode || "MANUAL").toUpperCase();
+
+  metodeLoginAktif = metode;
+  setPesanLogin("");
+
+  const manual = metode === "MANUAL";
+  const qr = metode === "QR";
+  const rfid = metode === "RFID";
+
+  document.getElementById("loginManualPanel")
+    .classList.toggle("active", manual);
+
+  document.getElementById("loginQRPanel")
+    .classList.toggle("active", qr);
+
+  document.getElementById("loginRFIDPanel")
+    .classList.toggle("active", rfid);
+
+  document.getElementById("tabLoginManual")
+    .classList.toggle("active", manual);
+
+  document.getElementById("tabLoginQR")
+    .classList.toggle("active", qr);
+
+  document.getElementById("tabLoginRFID")
+    .classList.toggle("active", rfid);
+
+  if (!qr) {
+    hentikanLoginQR();
+  }
+
+  loginRfidAktif = rfid;
+
+  const inputRFID =
+    document.getElementById("loginRfidInput");
+
+  if (!rfid && inputRFID) {
+    inputRFID.value = "";
+    inputRFID.blur();
+  }
+
+  if (rfid) {
+    const status =
+      document.getElementById("statusLoginRFID");
+
+    if (status) {
+      status.className = "login-status";
+      status.textContent =
+        "Reader siap. Tap satu kartu guru.";
+    }
+
+    fokusLoginRFID();
+  }
+}
+
+
 async function loadGuru() {
   try {
     const r =
@@ -1929,7 +2432,7 @@ async function loadGuru() {
     const select =
       document.getElementById("guru");
 
-    d.data.forEach(g => {
+    (d.data || []).forEach(g => {
       const op =
         document.createElement("option");
 
@@ -1952,36 +2455,98 @@ async function loadGuru() {
 
 loadGuru();
 
+
+loginQrScanner =
+new QrScanner(
+  document.getElementById("loginQrVideo"),
+  hasil => {
+    if (
+      !loginQrAktif ||
+      loginQrMemproses ||
+      metodeLoginAktif !== "QR"
+    ) {
+      return;
+    }
+
+    const qrKey =
+      String(hasil.data || "").trim();
+
+    if (!qrKey) return;
+
+    if (qrKey === loginQrTerakhir) {
+      return;
+    }
+
+    loginQrTerakhir = qrKey;
+
+    if (loginQrResetTimer) {
+      clearTimeout(loginQrResetTimer);
+    }
+
+    loginQrResetTimer =
+      setTimeout(() => {
+        loginQrTerakhir = "";
+        loginQrResetTimer = null;
+      }, 1200);
+
+    prosesLoginQR(qrKey);
+  },
+  {
+    preferredCamera: "environment",
+    highlightScanRegion: true,
+    highlightCodeOutline: true,
+    returnDetailedScanResult: true
+  }
+);
+
+
+document.getElementById("tabLoginManual").onclick =
+  () => pilihMetodeLogin("MANUAL");
+
+
+document.getElementById("tabLoginQR").onclick =
+async function() {
+  pilihMetodeLogin("QR");
+  await aktifkanLoginQR();
+};
+
+
+document.getElementById("tabLoginRFID").onclick =
+function() {
+  pilihMetodeLogin("RFID");
+};
+
+
+document.getElementById("mulaiLoginQR").onclick =
+  aktifkanLoginQR;
+
+
 document.getElementById("login").onclick =
 async function() {
-
   const idGuru =
     document.getElementById("guru").value;
 
   const pin =
     document.getElementById("pin").value;
 
-  const d =
-    await post({
-      action: "loginGuru",
-      idGuru: idGuru,
-      pin: pin
-    });
+  setPesanLogin("");
+
+  const d = await post({
+    action: "loginGuru",
+    idGuru: idGuru,
+    pin: pin
+  });
 
   if (!d.berhasil) {
-    document.getElementById("pesanLogin").textContent =
-      d.pesan;
+    setPesanLogin(
+      d.pesan || "Login gagal."
+    );
     return;
   }
 
-  token = d.token;
-  namaGuru = d.guru.nama;
-
-  localStorage.setItem("absensi_token", token);
-  localStorage.setItem("absensi_guru", namaGuru);
-
-  bukaApp();
+  simpanLoginBerhasil(d);
 };
+
 
 document.getElementById("pin").addEventListener(
   "keydown",
@@ -1993,8 +2558,70 @@ document.getElementById("pin").addEventListener(
 );
 
 
+const loginRfidInput =
+  document.getElementById("loginRfidInput");
+
+loginRfidInput.addEventListener("keydown", event => {
+  if (event.key !== "Enter") return;
+
+  event.preventDefault();
+
+  const uid =
+    loginRfidInput.value.trim();
+
+  loginRfidInput.value = "";
+
+  prosesLoginRFID(uid);
+});
+
+loginRfidInput.addEventListener("blur", () => {
+  if (loginRfidAktif) {
+    fokusLoginRFID();
+  }
+});
+
+
+document.addEventListener("click", event => {
+  if (
+    loginRfidAktif &&
+    metodeLoginAktif === "RFID" &&
+    !event.target.closest("#tabLoginManual") &&
+    !event.target.closest("#tabLoginQR")
+  ) {
+    fokusLoginRFID();
+  }
+});
+
+
+window.addEventListener("focus", () => {
+  if (loginRfidAktif) {
+    fokusLoginRFID();
+  }
+});
+
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && loginRfidAktif) {
+    fokusLoginRFID();
+  }
+});
+
+
+pilihMetodeLogin("MANUAL");
+
+
 /* APP */
 function bukaApp() {
+  loginRfidAktif = false;
+  loginQrAktif = false;
+
+  try {
+    if (loginQrScanner) loginQrScanner.stop();
+  } catch (error) {}
+
+  const loginRfid = document.getElementById("loginRfidInput");
+  if (loginRfid) loginRfid.blur();
+
   document.getElementById("halamanLogin").style.display =
     "none";
 
@@ -2954,7 +3581,7 @@ document.addEventListener("visibilitychange", () => {
   ----------------------
   1. Kamera tidak menunggu server sebelum menerima QR siswa berikutnya.
   2. Setiap QR unik langsung masuk antrean lokal.
-  3. Presensi dikirim ke Apps Script satu per satu di belakang layar.
+  3. Presensi dikirim ke Apps Script maksimal dua request paralel di belakang layar.
   4. Anti-double utama tetap ditentukan backend.
   5. QR yang sama hanya dikunci saat sedang antre/diproses; setelah selesai boleh discan ulang untuk mengecek anti-double backend.
 */
@@ -3070,7 +3697,7 @@ function masukkanKeAntrean(idQR, opsi = {}) {
 function jumlahBelumSinkron() {
   return (
     antrianQR.length +
-    (itemSedangDiproses ? 1 : 0)
+    qrSedangDiproses.size
   );
 }
 
@@ -3234,10 +3861,7 @@ function cobaKirimUlang(idQR) {
     return;
   }
 
-  if (
-    itemSedangDiproses &&
-    itemSedangDiproses.idQR === idQR
-  ) {
+  if (qrSedangDiproses.has(idQR)) {
     return;
   }
 
@@ -3295,7 +3919,7 @@ function perbaruiDetailScan() {
   }
 
   badgeProses.textContent =
-    itemSedangDiproses ? "1" : "0";
+    String(qrSedangDiproses.size);
 
   badgeMenunggu.textContent =
     String(antrianQR.length);
@@ -3303,37 +3927,42 @@ function perbaruiDetailScan() {
   badgeGagal.textContent =
     String(daftarGagalScan.length);
 
-  if (itemSedangDiproses) {
-
-    const mulai =
-      itemSedangDiproses.waktuMulaiProses ||
-      itemSedangDiproses.waktuMasuk ||
-      sekarang;
-
-    const lama =
-      sekarang - mulai;
-
-    const kelas =
-      kelasDurasi(lama, "proses");
+  if (qrSedangDiproses.size > 0) {
 
     detailProses.className =
-      "scan-detail-item " + kelas;
+      "scan-detail-list";
 
     detailProses.innerHTML =
-      '<div class="scan-detail-main">' +
-        '<div class="scan-detail-name">QR/ID: ' +
-          escapeHtml(itemSedangDiproses.idQR) +
-        '</div>' +
-        '<div class="scan-detail-meta">' +
-          (itemSedangDiproses.percobaanUlang
-            ? "Percobaan kirim ulang • "
-            : "Sedang dikirim ke server • ") +
-          'Batas respons 15 detik' +
-        '</div>' +
-      '</div>' +
-      '<div class="scan-detail-time">' +
-        labelDurasi(lama, "proses") +
-      '</div>';
+      Array.from(qrSedangDiproses.values())
+        .map(item => {
+          const mulai =
+            item.waktuMulaiProses ||
+            item.waktuMasuk ||
+            sekarang;
+
+          const lama = sekarang - mulai;
+          const kelas = kelasDurasi(lama, "proses");
+
+          return (
+            '<div class="scan-detail-item ' + kelas + '">' +
+              '<div class="scan-detail-main">' +
+                '<div class="scan-detail-name">QR/ID: ' +
+                  escapeHtml(item.idQR) +
+                '</div>' +
+                '<div class="scan-detail-meta">' +
+                  (item.percobaanUlang
+                    ? "Percobaan kirim ulang • "
+                    : "Sedang dikirim ke server • ") +
+                  'Worker paralel QR • Batas respons 15 detik' +
+                '</div>' +
+              '</div>' +
+              '<div class="scan-detail-time">' +
+                labelDurasi(lama, "proses") +
+              '</div>' +
+            '</div>'
+          );
+        })
+        .join("");
 
   } else {
 
@@ -3540,54 +4169,80 @@ async function kirimPresensiAntrean(item) {
 }
 
 
-async function jalankanAntrean() {
+async function pekerjaAntreanQR() {
+  qrPekerjaAktif++;
 
-  if (pekerjaAntrianAktif) return;
-
-  pekerjaAntrianAktif = true;
+  let item = null;
 
   try {
-
     while (antrianQR.length > 0) {
+      item = antrianQR.shift();
 
-      itemSedangDiproses =
-        antrianQR.shift();
+      if (!item) break;
 
-      itemSedangDiproses.waktuMulaiProses =
+      item.waktuMulaiProses =
         Date.now();
 
-      perbaruiStatScan();
+      qrSedangDiproses.set(
+        item.idQR,
+        item
+      );
 
-      const itemSelesai =
-        itemSedangDiproses;
+      perbaruiStatScan();
+      perbaruiDetailScan();
 
       const d =
-        await kirimPresensiAntrean(
-          itemSelesai
-        );
+        await kirimPresensiAntrean(item);
 
       const idSelesai =
-        itemSelesai.idQR;
+        item.idQR;
 
-      tampilQR(d, idSelesai, itemSelesai);
+      tampilQR(d, idSelesai, item);
 
       /*
         Kunci lokal hanya berlaku selama QR sedang antre/diproses.
-        Setelah server selesai menjawab, ID selalu dilepas.
-        Pengaman qrTerakhir tetap mencegah spam selama kartu masih
-        terus terlihat kamera.
+        Setelah server selesai menjawab, ID dilepas. Anti-double utama
+        tetap ditentukan backend sehingga QR/RFID dan multi-device tetap aman.
       */
       idTerkunciSesi.delete(idSelesai);
+      qrSedangDiproses.delete(idSelesai);
+      item = null;
 
-      itemSedangDiproses = null;
       perbaruiStatScan();
+      perbaruiDetailScan();
     }
 
   } finally {
+    if (item) {
+      idTerkunciSesi.delete(item.idQR);
+      qrSedangDiproses.delete(item.idQR);
+    }
 
-    itemSedangDiproses = null;
-    pekerjaAntrianAktif = false;
+    qrPekerjaAktif =
+      Math.max(0, qrPekerjaAktif - 1);
+
     perbaruiStatScan();
+    perbaruiDetailScan();
+
+    if (antrianQR.length > 0) {
+      jalankanAntrean();
+    }
+  }
+}
+
+
+function jalankanAntrean() {
+  /*
+   * Optimasi produksi QR:
+   * maksimal dua request berjalan bersamaan, sama seperti RFID.
+   * Backend tetap memakai ScriptLock pada bagian kritis sehingga
+   * anti-double lintas QR/RFID dan pemakaian 2 device tetap dilindungi.
+   */
+  while (
+    qrPekerjaAktif < QR_MAX_PEKERJA &&
+    antrianQR.length > 0
+  ) {
+    pekerjaAntreanQR();
   }
 }
 
