@@ -465,10 +465,33 @@ $("pdf").onclick = function() {
     }
 
     const nama = `Rekap_Presensi_${$("tanggalMulai").value}_${$("tanggalAkhir").value}.pdf`;
-    doc.save(nama);
 
-    $("pesan").className = "status";
-    $("pesan").textContent = "PDF berhasil dibuat. Cek folder Download perangkat.";
+    /*
+     * Di aplikasi Android, jsPDF doc.save() hanya membuat file di memori WebView
+     * dan belum tentu benar-benar masuk ke folder Download.
+     *
+     * APK Presensi Pagi sudah menyediakan AndroidApp.saveBase64(),
+     * jadi PDF dikirim langsung ke Android untuk disimpan secara native.
+     *
+     * Di browser biasa, tetap gunakan doc.save() seperti normal.
+     */
+    if (
+      window.AndroidApp &&
+      typeof window.AndroidApp.saveBase64 === "function"
+    ) {
+      const dataUri = doc.output("datauristring");
+      window.AndroidApp.saveBase64(nama, dataUri);
+
+      $("pesan").className = "status";
+      $("pesan").textContent =
+        "PDF berhasil dibuat dan dikirim ke folder Download/Presensi Pagi.";
+    } else {
+      doc.save(nama);
+
+      $("pesan").className = "status";
+      $("pesan").textContent =
+        "PDF berhasil dibuat. Cek folder Download perangkat.";
+    }
 
   } catch (e) {
     console.error("PDF export error:", e);
