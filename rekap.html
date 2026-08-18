@@ -7,7 +7,7 @@
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="https://unpkg.com/jspdf@4.2.1/dist/jspdf.umd.min.js"></script>
-  <script src="https://unpkg.com/jspdf-autotable@5.0.5/dist/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://unpkg.com/jspdf-autotable@5.0.8/dist/jspdf.plugin.autotable.min.js"></script>
 
   <style>
     * { box-sizing: border-box; }
@@ -403,46 +403,81 @@ $("excel").onclick = function() {
 $("pdf").onclick = function() {
   if (!hasilTerakhir || !hasilTerakhir.data.length) return;
 
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation:"landscape", unit:"mm", format:"a4" });
+  const tombol = this;
+  const teksAwal = tombol.textContent;
 
-  doc.setFontSize(14);
-  doc.text("SMP ISLAM CIPAKU", 148.5, 12, {align:"center"});
-  doc.setFontSize(11);
-  doc.text("REKAP PRESENSI KEGIATAN", 148.5, 18, {align:"center"});
-  doc.setFontSize(8);
-  doc.text(
-    `Periode: ${hasilTerakhir.periode.mulai} s.d. ${hasilTerakhir.periode.akhir} | ` +
-    `Kegiatan: ${hasilTerakhir.filter.kegiatan} | Kelas: ${hasilTerakhir.filter.kelas} | ` +
-    `JK: ${hasilTerakhir.filter.jk} | Status: ${hasilTerakhir.filter.status}`,
-    10, 24
-  );
+  try {
+    tombol.disabled = true;
+    tombol.textContent = "⏳ MEMBUAT PDF...";
+    $("pesan").className = "status";
+    $("pesan").textContent = "Menyiapkan file PDF...";
 
-  const body = hasilTerakhir.data.map((x,i) => [
-    i+1, x.tanggal, x.kegiatan, x.nama, x.kelas, x.jk,
-    x.status, x.jam, x.metode, x.petugas, x.alasan
-  ]);
-
-  doc.autoTable({
-    startY: 28,
-    head: [["No","Tanggal","Kegiatan","Nama","Kelas","JK","Status","Jam","Metode","Petugas","Alasan"]],
-    body,
-    styles: { fontSize:6.5, cellPadding:1.5, overflow:"linebreak" },
-    headStyles: { fillColor:[27,94,32] },
-    columnStyles: {
-      0:{cellWidth:8},1:{cellWidth:18},2:{cellWidth:24},3:{cellWidth:42},
-      4:{cellWidth:14},5:{cellWidth:9},6:{cellWidth:20},7:{cellWidth:16},
-      8:{cellWidth:20},9:{cellWidth:32},10:{cellWidth:45}
-    },
-    didDrawPage: function(data) {
-      const pageCount = doc.getNumberOfPages();
-      doc.setFontSize(7);
-      doc.text(`Halaman ${pageCount}`, 285, 202, {align:"right"});
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      throw new Error("Library jsPDF tidak termuat.");
     }
-  });
 
-  const nama = `Rekap_Presensi_${$("tanggalMulai").value}_${$("tanggalAkhir").value}.pdf`;
-  doc.save(nama);
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:"landscape", unit:"mm", format:"a4" });
+
+    doc.setFontSize(14);
+    doc.text("SMP ISLAM CIPAKU", 148.5, 12, {align:"center"});
+    doc.setFontSize(11);
+    doc.text("REKAP PRESENSI KEGIATAN", 148.5, 18, {align:"center"});
+    doc.setFontSize(8);
+    doc.text(
+      `Periode: ${hasilTerakhir.periode.mulai} s.d. ${hasilTerakhir.periode.akhir} | ` +
+      `Kegiatan: ${hasilTerakhir.filter.kegiatan} | Kelas: ${hasilTerakhir.filter.kelas} | ` +
+      `JK: ${hasilTerakhir.filter.jk} | Status: ${hasilTerakhir.filter.status}`,
+      10, 24
+    );
+
+    const body = hasilTerakhir.data.map((x,i) => [
+      i+1, x.tanggal, x.kegiatan, x.nama, x.kelas, x.jk,
+      x.status, x.jam, x.metode, x.petugas, x.alasan
+    ]);
+
+    const opsiTabel = {
+      startY: 28,
+      head: [["No","Tanggal","Kegiatan","Nama","Kelas","JK","Status","Jam","Metode","Petugas","Alasan"]],
+      body,
+      styles: { fontSize:6.5, cellPadding:1.5, overflow:"linebreak" },
+      headStyles: { fillColor:[27,94,32] },
+      columnStyles: {
+        0:{cellWidth:8},1:{cellWidth:18},2:{cellWidth:24},3:{cellWidth:42},
+        4:{cellWidth:14},5:{cellWidth:9},6:{cellWidth:20},7:{cellWidth:16},
+        8:{cellWidth:20},9:{cellWidth:32},10:{cellWidth:45}
+      },
+      didDrawPage: function(data) {
+        doc.setFontSize(7);
+        doc.text(`Halaman ${data.pageNumber}`, 285, 202, {align:"right"});
+      }
+    };
+
+    if (typeof doc.autoTable === "function") {
+      doc.autoTable(opsiTabel);
+    } else {
+      const plugin = window["jspdf-autotable"];
+      if (plugin && typeof plugin.autoTable === "function") {
+        plugin.autoTable(doc, opsiTabel);
+      } else {
+        throw new Error("Plugin tabel PDF tidak termuat.");
+      }
+    }
+
+    const nama = `Rekap_Presensi_${$("tanggalMulai").value}_${$("tanggalAkhir").value}.pdf`;
+    doc.save(nama);
+
+    $("pesan").className = "status";
+    $("pesan").textContent = "PDF berhasil dibuat. Cek folder Download perangkat.";
+
+  } catch (e) {
+    console.error("PDF export error:", e);
+    $("pesan").className = "status error";
+    $("pesan").textContent = "PDF gagal dibuat: " + (e && e.message ? e.message : "Kesalahan tidak diketahui.");
+  } finally {
+    tombol.disabled = false;
+    tombol.textContent = teksAwal;
+  }
 };
 
 $("preset").onchange = aturPreset;
