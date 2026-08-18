@@ -2059,6 +2059,328 @@ button.persen-tab.active {
   }
 }
 
+
+/* =====================================================
+   MENU CLEAN PROFESSIONAL — VISUAL ONLY
+   Override ini sengaja berada paling akhir agar tidak
+   terpengaruh style tombol global aplikasi.
+===================================================== */
+
+.menu-dashboard {
+  gap: 16px !important;
+  margin: 0 0 18px !important;
+}
+
+.menu-group {
+  padding: 18px !important;
+  border-radius: 20px !important;
+  background: #ffffff !important;
+  box-shadow: 0 8px 24px rgba(29, 48, 41, .055) !important;
+}
+
+.menu-group.presensi {
+  border: 1px solid #dbe8e1 !important;
+}
+
+.menu-group.monitoring {
+  border: 1px solid #e2def7 !important;
+  background: #fdfcff !important;
+}
+
+.menu-group.pengelolaan {
+  border: 1px solid #f1dfca !important;
+  background: #fffdfa !important;
+}
+
+.menu-group-head {
+  gap: 12px !important;
+  margin-bottom: 16px !important;
+}
+
+.menu-group-icon {
+  width: 46px !important;
+  height: 46px !important;
+  flex: 0 0 46px !important;
+  border-radius: 15px !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+.menu-group-icon svg,
+.menu-tile-icon svg,
+.menu-tile-chevron svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.presensi .menu-group-icon {
+  background: #eaf6f0 !important;
+  color: #147653 !important;
+}
+
+.monitoring .menu-group-icon {
+  background: #f0edfb !important;
+  color: #4b32a8 !important;
+}
+
+.pengelolaan .menu-group-icon {
+  background: #fff0df !important;
+  color: #d76f00 !important;
+}
+
+.menu-group-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.menu-group-title {
+  margin: 0 !important;
+  font-size: 17px !important;
+  line-height: 1.15 !important;
+  font-weight: 900 !important;
+  letter-spacing: .1px !important;
+}
+
+.presensi .menu-group-title {
+  color: #1b4d3a !important;
+}
+
+.monitoring .menu-group-title {
+  color: #47309b !important;
+}
+
+.pengelolaan .menu-group-title {
+  color: #b85b00 !important;
+}
+
+.menu-group-subtitle {
+  margin-top: 4px !important;
+  color: #708078 !important;
+  font-size: 12.5px !important;
+  line-height: 1.4 !important;
+}
+
+.menu-grid-pro {
+  gap: 12px !important;
+}
+
+.menu-grid-pro.cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+.menu-grid-pro.cols-1 {
+  grid-template-columns: 1fr !important;
+}
+
+button.menu-tile {
+  position: relative !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 122px !important;
+  margin: 0 !important;
+  padding: 16px 42px 16px 16px !important;
+  border-radius: 16px !important;
+  border: 1px solid #dde5e1 !important;
+  background: #ffffff !important;
+  color: #233a31 !important;
+  box-shadow: 0 4px 13px rgba(34, 55, 47, .065) !important;
+  display: grid !important;
+  grid-template-columns: 58px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 13px !important;
+  text-align: left !important;
+  transform: none !important;
+  transition:
+    transform .14s ease,
+    box-shadow .14s ease,
+    border-color .14s ease !important;
+}
+
+button.menu-tile:hover {
+  background: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 9px 22px rgba(34, 55, 47, .10) !important;
+}
+
+button.menu-tile:active {
+  background: #fafcfb !important;
+  transform: scale(.985) !important;
+}
+
+button.menu-tile::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 13px;
+  bottom: 13px;
+  width: 4px;
+  border-radius: 0 999px 999px 0;
+  background: currentColor;
+}
+
+.menu-tile-icon {
+  width: 58px !important;
+  height: 58px !important;
+  border-radius: 50% !important;
+  display: grid !important;
+  place-items: center !important;
+  font-size: 0 !important;
+}
+
+.menu-tile-icon svg {
+  width: 29px !important;
+  height: 29px !important;
+}
+
+.menu-tile-copy {
+  min-width: 0 !important;
+  display: block !important;
+}
+
+.menu-tile-label {
+  display: block !important;
+  margin: 0 !important;
+  color: currentColor !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  line-height: 1.25 !important;
+  letter-spacing: .05px !important;
+}
+
+.menu-tile-desc {
+  display: block !important;
+  margin-top: 6px !important;
+  color: #718079 !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  line-height: 1.45 !important;
+}
+
+.menu-tile-chevron {
+  position: absolute !important;
+  right: 14px !important;
+  top: 50% !important;
+  width: 20px !important;
+  height: 20px !important;
+  transform: translateY(-50%) !important;
+  color: currentColor !important;
+  opacity: .9 !important;
+}
+
+.menu-tile-chevron svg {
+  width: 20px !important;
+  height: 20px !important;
+  stroke-width: 2.3 !important;
+}
+
+button.menu-tile.tile-green {
+  color: #147653 !important;
+  border-left-color: #22a06b !important;
+}
+
+button.menu-tile.tile-green .menu-tile-icon {
+  background: #eaf6f0 !important;
+}
+
+button.menu-tile.tile-blue {
+  color: #1466b8 !important;
+  border-left-color: #2a7ccc !important;
+}
+
+button.menu-tile.tile-blue .menu-tile-icon {
+  background: #eaf3fc !important;
+}
+
+button.menu-tile.tile-orange {
+  color: #df7900 !important;
+  border-left-color: #ef921d !important;
+}
+
+button.menu-tile.tile-orange .menu-tile-icon {
+  background: #fff2df !important;
+}
+
+button.menu-tile.tile-purple {
+  color: #4e31a7 !important;
+  border-left-color: #6547c0 !important;
+}
+
+button.menu-tile.tile-purple .menu-tile-icon {
+  background: #f1edfb !important;
+}
+
+button.menu-tile.tile-admin {
+  color: #bd5e00 !important;
+  border-left-color: #ea8618 !important;
+}
+
+button.menu-tile.tile-admin .menu-tile-icon {
+  background: #fff1e2 !important;
+}
+
+/* Desktop/tablet lebar */
+@media (min-width: 900px) {
+  .container {
+    max-width: 1120px !important;
+  }
+}
+
+/* Tablet sedang: tetap rapi, 2 kolom */
+@media (max-width: 899px) {
+  .menu-grid-pro.cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  button.menu-tile {
+    min-height: 116px !important;
+  }
+}
+
+/* HP: satu kartu per baris supaya teks tetap terbaca */
+@media (max-width: 560px) {
+  .menu-group {
+    padding: 14px !important;
+  }
+
+  .menu-grid-pro.cols-3,
+  .menu-grid-pro.cols-2,
+  .menu-grid-pro.cols-1 {
+    grid-template-columns: 1fr !important;
+  }
+
+  button.menu-tile {
+    min-height: 96px !important;
+    padding: 13px 40px 13px 13px !important;
+    grid-template-columns: 50px minmax(0, 1fr) !important;
+    gap: 11px !important;
+  }
+
+  .menu-tile-icon {
+    width: 50px !important;
+    height: 50px !important;
+  }
+
+  .menu-tile-icon svg {
+    width: 25px !important;
+    height: 25px !important;
+  }
+
+  .menu-tile-label {
+    font-size: 13px !important;
+  }
+
+  .menu-tile-desc {
+    display: block !important;
+    margin-top: 4px !important;
+    font-size: 10.5px !important;
+  }
+}
+
 </style>
 </head>
 
@@ -2185,12 +2507,15 @@ button.persen-tab.active {
         </div>
       </div>
 
-      <!-- MENU UTAMA TERKELOMPOK -->
+      <!-- MENU UTAMA TERKELOMPOK — CLEAN PROFESSIONAL -->
       <div class="menu-dashboard">
 
         <section class="menu-group presensi">
           <div class="menu-group-head">
-            <div class="menu-group-icon">✓</div>
+            <div class="menu-group-icon"><svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="m8 12 2.5 2.5L16.5 8.5"/>
+    </svg></div>
             <div class="menu-group-copy">
               <div class="menu-group-title">PRESENSI</div>
               <div class="menu-group-subtitle">Menu untuk mencatat kehadiran siswa.</div>
@@ -2198,29 +2523,55 @@ button.persen-tab.active {
           </div>
 
           <div class="menu-grid-pro cols-3">
-            <button id="menuQR" class="menu-tile primary" type="button">
-              <span class="menu-tile-icon">📷</span>
-              <span class="menu-tile-label">SCAN QR</span>
-              <span class="menu-tile-desc">Scan QR siswa untuk presensi.</span>
+            <button id="menuQR" class="menu-tile tile-green" type="button">
+              <span class="menu-tile-icon"><svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/>
+      <path d="M15 14h2v2h-2zM18 14h2v4h-2zM14 18h4v2h-4zM20 20h-2v-2h2z"/>
+    </svg></span>
+              <span class="menu-tile-copy">
+                <span class="menu-tile-label">SCAN QR</span>
+                <span class="menu-tile-desc">Scan QR siswa untuk presensi.</span>
+              </span>
+              <span class="menu-tile-chevron" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg>
+    </span>
             </button>
 
-            <button id="menuRFID" class="menu-tile" type="button">
-              <span class="menu-tile-icon">💳</span>
-              <span class="menu-tile-label">TAP KARTU</span>
-              <span class="menu-tile-desc">Tap kartu RFID siswa.</span>
+            <button id="menuRFID" class="menu-tile tile-blue" type="button">
+              <span class="menu-tile-icon"><svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="5" width="18" height="14" rx="2"/>
+      <path d="M3 9h18M7 15h5"/>
+    </svg></span>
+              <span class="menu-tile-copy">
+                <span class="menu-tile-label">TAP KARTU</span>
+                <span class="menu-tile-desc">Tap kartu RFID siswa.</span>
+              </span>
+              <span class="menu-tile-chevron" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg>
+    </span>
             </button>
 
-            <button id="menuManual" class="menu-tile" type="button">
-              <span class="menu-tile-icon">✍️</span>
-              <span class="menu-tile-label">ABSEN MANUAL</span>
-              <span class="menu-tile-desc">Input presensi siswa secara manual.</span>
+            <button id="menuManual" class="menu-tile tile-orange" type="button">
+              <span class="menu-tile-icon"><svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 19.5V16l10.8-10.8a2.1 2.1 0 0 1 3 3L7 19H4z"/>
+      <path d="m13.5 6.5 4 4M14 19h6M17 14.5a3 3 0 1 1-6 0"/>
+    </svg></span>
+              <span class="menu-tile-copy">
+                <span class="menu-tile-label">ABSEN MANUAL</span>
+                <span class="menu-tile-desc">Input presensi siswa secara manual.</span>
+              </span>
+              <span class="menu-tile-chevron" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg>
+    </span>
             </button>
           </div>
         </section>
 
         <section class="menu-group monitoring">
           <div class="menu-group-head">
-            <div class="menu-group-icon">👥</div>
+            <div class="menu-group-icon"><svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 19V11M12 19V5M19 19v-8"/>
+    </svg></div>
             <div class="menu-group-copy">
               <div class="menu-group-title">MONITORING</div>
               <div class="menu-group-subtitle">Pantau kehadiran, persentase, koreksi data hari ini, dan buka rekap.</div>
@@ -2228,29 +2579,59 @@ button.persen-tab.active {
           </div>
 
           <div class="menu-grid-pro cols-3">
-            <button id="menuStatus" class="menu-tile monitor" type="button">
-              <span class="menu-tile-icon">👥</span>
-              <span class="menu-tile-label">KEHADIRAN</span>
-              <span class="menu-tile-desc">Lihat dan koreksi presensi hari ini.</span>
+            <button id="menuStatus" class="menu-tile tile-purple" type="button">
+              <span class="menu-tile-icon"><svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="9" cy="8" r="3"/>
+      <path d="M3.5 19v-1.5A4.5 4.5 0 0 1 8 13h2a4.5 4.5 0 0 1 4.5 4.5V19"/>
+      <circle cx="17" cy="9" r="2.5"/>
+      <path d="M15.5 14h1.5a4 4 0 0 1 4 4v1"/>
+    </svg></span>
+              <span class="menu-tile-copy">
+                <span class="menu-tile-label">KEHADIRAN</span>
+                <span class="menu-tile-desc">Lihat dan koreksi presensi hari ini.</span>
+              </span>
+              <span class="menu-tile-chevron" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg>
+    </span>
             </button>
 
-            <button id="menuRekap" class="menu-tile monitor" type="button">
-              <span class="menu-tile-icon">📊</span>
-              <span class="menu-tile-label">REKAP & EXPORT</span>
-              <span class="menu-tile-desc">Rekap presensi serta export Excel/PDF.</span>
+            <button id="menuRekap" class="menu-tile tile-purple" type="button">
+              <span class="menu-tile-icon"><svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 3h9l3 3v15H6z"/>
+      <path d="M15 3v4h4M9 16v-3M12 16V9M15 16v-5"/>
+    </svg></span>
+              <span class="menu-tile-copy">
+                <span class="menu-tile-label">REKAP &amp; EXPORT</span>
+                <span class="menu-tile-desc">Rekap presensi serta export Excel/PDF.</span>
+              </span>
+              <span class="menu-tile-chevron" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg>
+    </span>
             </button>
 
-            <button id="menuPersentase" class="menu-tile monitor" type="button">
-              <span class="menu-tile-icon">📈</span>
-              <span class="menu-tile-label">PERSENTASE</span>
-              <span class="menu-tile-desc">Persentase per kelas, siswa, dan kegiatan.</span>
+            <button id="menuPersentase" class="menu-tile tile-purple" type="button">
+              <span class="menu-tile-icon"><svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M11 3a8 8 0 1 0 8 8h-8z"/>
+      <path d="M13 3v6h6a8 8 0 0 0-6-6z"/>
+    </svg></span>
+              <span class="menu-tile-copy">
+                <span class="menu-tile-label">PERSENTASE</span>
+                <span class="menu-tile-desc">Persentase per kelas, siswa, dan kegiatan.</span>
+              </span>
+              <span class="menu-tile-chevron" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg>
+    </span>
             </button>
           </div>
         </section>
 
         <section class="menu-group pengelolaan">
           <div class="menu-group-head">
-            <div class="menu-group-icon">⚙️</div>
+            <div class="menu-group-icon"><svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M12 2.8v2M12 19.2v2M21.2 12h-2M4.8 12h-2M18.5 5.5l-1.4 1.4M6.9 17.1l-1.4 1.4M18.5 18.5l-1.4-1.4M6.9 6.9 5.5 5.5"/>
+      <circle cx="12" cy="12" r="7"/>
+    </svg></div>
             <div class="menu-group-copy">
               <div class="menu-group-title">PENGELOLAAN</div>
               <div class="menu-group-subtitle">Kelola data siswa dan pengaturan administrasi.</div>
@@ -2258,14 +2639,25 @@ button.persen-tab.active {
           </div>
 
           <div class="menu-grid-pro cols-1">
-            <button id="menuAdmin" class="menu-tile admin" type="button">
-              <span class="menu-tile-icon">⚙️</span>
-              <span class="menu-tile-label">ADMIN / DATA SISWA</span>
-              <span class="menu-tile-desc">Kelola data siswa dan administrasi sistem.</span>
+            <button id="menuAdmin" class="menu-tile tile-admin" type="button">
+              <span class="menu-tile-icon"><svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="9" cy="8" r="3"/>
+      <path d="M3.5 18.5A4.5 4.5 0 0 1 8 14h2a4.5 4.5 0 0 1 3.2 1.3"/>
+      <circle cx="17.5" cy="17.5" r="3"/>
+      <path d="M17.5 13.2v1.2M17.5 20.6v1.2M13.2 17.5h1.2M20.6 17.5h1.2M14.5 14.5l.9.9M19.6 19.6l.9.9M20.5 14.5l-.9.9M15.4 19.6l-.9.9"/>
+    </svg></span>
+              <span class="menu-tile-copy">
+                <span class="menu-tile-label">ADMIN / DATA SISWA</span>
+                <span class="menu-tile-desc">Kelola data siswa dan administrasi sistem.</span>
+              </span>
+              <span class="menu-tile-chevron" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg>
+    </span>
             </button>
           </div>
         </section>
 
+      </div>
       </div>
 
     </div>
