@@ -3097,8 +3097,52 @@ function pilihUbahStatus(s) {
   const select = document.getElementById("statusBaru");
   select.value = "HADIR";
   document.getElementById("catatanStatus").value = "";
+
+  // MEMUNCULKAN KEMBALI TOMBOL HAID
+  const btnHaid = document.getElementById("mulaiHaid");
+  const kegiatan = kegiatanStatusDipilih || document.getElementById("kegiatanStatusSelect").value;
+  const namaKeg = String(kegiatan).toLowerCase();
+  const isSalat = namaKeg.includes("dhuha") || namaKeg.includes("dzuhur") || namaKeg.includes("zuhur");
+
+  // Tombol hanya muncul jika kegiatannya salat & siswanya perempuan (P)
+  if (isSalat && String(s.jk).trim().toUpperCase() === "P") {
+    btnHaid.style.display = "inline-block";
+  } else {
+    btnHaid.style.display = "none";
+  }
+
   document.getElementById("panelUbahStatus").scrollIntoView({ behavior: "smooth", block: "start" });
 }
+  document.getElementById("mulaiHaid").onclick = async function() {
+  if (!siswaUbah) return;
+
+  const kegiatan = kegiatanStatusDipilih || document.getElementById("kegiatanStatusSelect").value;
+
+  this.disabled = true;
+  this.textContent = "MEMPROSES...";
+
+  const d = await post({
+    action: "mulaiStatusHaid",
+    idSiswa: siswaUbah.id,
+    kegiatan: kegiatan,
+    token: token
+  });
+
+  this.disabled = false;
+  this.textContent = "🌸 MULAI HAID";
+
+  if (cekLoginHabis(d)) return;
+
+  if (!d.berhasil) {
+    alert(d.pesan);
+    return;
+  }
+
+  alert(d.pesan);
+  document.getElementById("panelUbahStatus").style.display = "none";
+  siswaUbah = null;
+  await loadStatus();
+};
 
 document.getElementById("batalStatus").onclick = function() {
   siswaUbah = null;
