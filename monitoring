@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Monitoring Kehadiran Siswa</title>
+
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f5f7fb;
+    margin:0;
+    padding:20px;
+}
+
+
+.container{
+    max-width:1200px;
+    margin:auto;
+}
+
+
+.header{
+    background:#14532d;
+    color:white;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:20px;
+}
+
+
+.card{
+    background:white;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:20px;
+}
+
+
+input,select{
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    margin-right:10px;
+}
+
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+}
+
+
+th{
+    background:#14532d;
+    color:white;
+    padding:12px;
+}
+
+
+td{
+    padding:10px;
+    text-align:center;
+    border-bottom:1px solid #eee;
+}
+
+
+.nama{
+    text-align:left;
+    font-weight:bold;
+}
+
+
+.hadir{
+    color:green;
+    font-weight:bold;
+}
+
+
+.terlambat{
+    color:#c77c00;
+    font-weight:bold;
+}
+
+
+.alpa,
+.tidak{
+    color:red;
+    font-weight:bold;
+}
+
+
+.dispensasi{
+    color:#d97706;
+    font-weight:bold;
+}
+
+
+@media(max-width:700px){
+
+table{
+    font-size:12px;
+}
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<div class="header">
+
+<h2>
+📚 Monitoring Kehadiran Siswa
+</h2>
+
+<div id="tanggal">
+Memuat tanggal...
+</div>
+
+</div>
+
+
+
+<div class="card">
+
+
+<select id="filterKelas" onchange="tampilkan()">
+
+<option value="">
+Semua Kelas
+</option>
+
+</select>
+
+
+<input 
+id="search"
+placeholder="Cari nama siswa..."
+onkeyup="tampilkan()">
+
+
+</div>
+
+
+
+<div class="card">
+
+
+<table>
+
+
+<thead id="thead"></thead>
+
+
+<tbody id="tbody">
+
+<tr>
+<td>
+Memuat data...
+</td>
+</tr>
+
+</tbody>
+
+
+</table>
+
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+
+const API = "https://script.google.com/macros/s/AKfycbzMINLAmz6Wd5d5QvdDefkLNtmkECDPOFZg2D1YUhjS5uQKDys2gbqjG-0AAIIvyi6h-g/exec";
+
+
+let dataSiswa=[];
+
+
+
+async function ambilData(){
+
+
+const response = await fetch(API,{
+
+method:"POST",
+
+headers:{
+"Content-Type":"text/plain;charset=UTF-8"
+},
+
+body:JSON.stringify({
+
+action:"publicMonitoring"
+
+})
+
+});
+
+
+const hasil = await response.json();
+
+
+if(!hasil.berhasil){
+
+alert("Gagal mengambil data");
+
+return;
+
+}
+
+
+dataSiswa = hasil.data;
+
+
+document.getElementById("tanggal").innerHTML =
+"📅 "+hasil.tanggal;
+
+
+buatFilter();
+
+
+tampilkan();
+
+
+}
+
+
+
+function buatFilter(){
+
+
+const kelas = 
+[...new Set(
+dataSiswa.map(x=>x.kelas)
+)];
+
+
+const select =
+document.getElementById("filterKelas");
+
+
+kelas.sort();
+
+
+kelas.forEach(k=>{
+
+
+let option=document.createElement("option");
+
+option.value=k;
+
+option.text=k;
+
+
+select.appendChild(option);
+
+
+});
+
+
+}
+
+
+
+
+function tampilkan(){
+
+
+const filter =
+document.getElementById("filterKelas").value;
+
+
+const cari =
+document.getElementById("search").value.toLowerCase();
+
+
+
+let data =
+dataSiswa.filter(x=>{
+
+
+return (
+
+(filter=="" || x.kelas==filter)
+
+&&
+
+x.nama.toLowerCase().includes(cari)
+
+);
+
+
+});
+
+
+
+data.sort((a,b)=>
+a.nama.localeCompare(b.nama)
+);
+
+
+
+buatTabel(data);
+
+
+}
+
+
+
+
+function buatTabel(data){
+
+
+if(data.length==0){
+
+document.getElementById("tbody").innerHTML =
+"<tr><td>Tidak ada data</td></tr>";
+
+return;
+
+}
+
+
+
+let kegiatan = Object.keys(
+data[0].kegiatan
+);
+
+
+
+let head = `
+
+<tr>
+
+<th>No</th>
+
+<th>Nama</th>
+
+<th>Kelas</th>
+
+`;
+
+
+
+kegiatan.forEach(k=>{
+
+head+=`
+<th>${k}</th>
+`;
+
+});
+
+
+head+="</tr>";
+
+
+document.getElementById("thead").innerHTML=head;
+
+
+
+let body="";
+
+
+data.forEach((s,i)=>{
+
+
+body+=`
+
+<tr>
+
+<td>${i+1}</td>
+
+<td class="nama">
+${s.nama}
+</td>
+
+<td>
+${s.kelas}
+</td>
+
+`;
+
+
+
+kegiatan.forEach(k=>{
+
+
+let d=s.kegiatan[k];
+
+
+body+=`
+
+<td class="${warnaStatus(d.status)}">
+
+${d.status}
+
+<br>
+
+<small>${d.jam}</small>
+
+</td>
+
+`;
+
+});
+
+
+body+="</tr>";
+
+
+});
+
+
+
+document.getElementById("tbody").innerHTML=body;
+
+
+}
+
+
+
+function warnaStatus(status){
+
+
+status=status.toLowerCase();
+
+
+if(status.includes("hadir"))
+return "hadir";
+
+
+if(status.includes("terlambat"))
+return "terlambat";
+
+
+if(
+status.includes("alpa")
+||
+status.includes("tidak")
+)
+return "alpa";
+
+
+if(status.includes("dispensasi"))
+return "dispensasi";
+
+
+return "";
+
+}
+
+
+
+ambilData();
+
+
+</script>
+
+
+</body>
+
+</html>
