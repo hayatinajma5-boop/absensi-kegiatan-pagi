@@ -8,7 +8,6 @@
 
 <title>Monitoring Kehadiran Siswa</title>
 
-
 <style>
 
 body{
@@ -18,42 +17,38 @@ body{
     padding:20px;
 }
 
-
 .container{
     max-width:1200px;
     margin:auto;
 }
 
-
 .header{
     background:#14532d;
     color:white;
-    padding:20px;
-    border-radius:12px;
+    padding:25px;
+    border-radius:15px;
     margin-bottom:20px;
 }
-
 
 .card{
     background:white;
-    padding:15px;
-    border-radius:12px;
+    padding:20px;
+    border-radius:15px;
     margin-bottom:20px;
 }
 
-
-input,select{
-    padding:10px;
+select,input{
+    padding:12px;
+    border:1px solid #ddd;
     border-radius:8px;
-    border:1px solid #ccc;
     margin-right:10px;
+    font-size:15px;
 }
 
 
 table{
     width:100%;
     border-collapse:collapse;
-    background:white;
 }
 
 
@@ -66,8 +61,8 @@ th{
 
 td{
     padding:10px;
-    text-align:center;
     border-bottom:1px solid #eee;
+    text-align:center;
 }
 
 
@@ -83,14 +78,7 @@ td{
 }
 
 
-.terlambat{
-    color:#c77c00;
-    font-weight:bold;
-}
-
-
-.alpa,
-.tidak{
+.alpa{
     color:red;
     font-weight:bold;
 }
@@ -102,13 +90,11 @@ td{
 }
 
 
-@media(max-width:700px){
-
-table{
-    font-size:12px;
+.terlambat{
+    color:#ca8a04;
+    font-weight:bold;
 }
 
-}
 
 </style>
 
@@ -127,16 +113,15 @@ table{
 📚 Monitoring Kehadiran Siswa
 </h2>
 
-<div id="tanggal">
+<p id="tanggal">
 Memuat tanggal...
-</div>
+</p>
 
 </div>
 
 
 
 <div class="card">
-
 
 <select id="filterKelas" onchange="tampilkan()">
 
@@ -162,9 +147,7 @@ onkeyup="tampilkan()">
 
 <table>
 
-
 <thead id="thead"></thead>
-
 
 <tbody id="tbody">
 
@@ -175,7 +158,6 @@ Memuat data...
 </tr>
 
 </tbody>
-
 
 </table>
 
@@ -190,7 +172,8 @@ Memuat data...
 <script>
 
 
-const API = "https://script.google.com/macros/s/AKfycbzMINLAmz6Wd5d5QvdDefkLNtmkECDPOFZg2D1YUhjS5uQKDys2gbqjG-0AAIIvyi6h-g/exec";
+const API = 
+"https://script.google.com/macros/s/AKfycbzMINLAmz6Wd5d5QvdDefkLNtmkECDPOFZg2D1YUhjS5uQKDys2gbqjG-0AAIIvyi6h-g/exec";
 
 
 let dataSiswa=[];
@@ -199,14 +182,12 @@ let dataSiswa=[];
 
 async function ambilData(){
 
+try{
+
 
 const response = await fetch(API,{
 
 method:"POST",
-
-headers:{
-"Content-Type":"text/plain;charset=UTF-8"
-},
 
 body:JSON.stringify({
 
@@ -217,27 +198,31 @@ action:"publicMonitoring"
 });
 
 
-const text = await response.text();
 
-alert(text);
-
-const hasil = JSON.parse(text);
+const hasil = await response.json();
 
 
-if(!hasil.berhasil){
+console.log("HASIL API:",hasil);
 
-alert("Gagal mengambil data");
 
-return;
+
+if(!hasil.data){
+
+throw new Error(
+"API belum mengirim data monitoring"
+);
 
 }
+
 
 
 dataSiswa = hasil.data;
 
 
+
 document.getElementById("tanggal").innerHTML =
 "📅 "+hasil.tanggal;
+
 
 
 buatFilter();
@@ -246,34 +231,66 @@ buatFilter();
 tampilkan();
 
 
+
 }
+
+catch(error){
+
+
+console.error(error);
+
+
+document.getElementById("tbody").innerHTML =
+
+`
+<tr>
+<td>
+Gagal mengambil data
+<br>
+${error.message}
+</td>
+</tr>
+`;
+
+
+}
+
+
+
+}
+
 
 
 
 function buatFilter(){
 
 
-const kelas = 
-[...new Set(
-dataSiswa.map(x=>x.kelas)
-)];
-
-
 const select =
 document.getElementById("filterKelas");
+
+
+const kelas =
+[
+...new Set(
+dataSiswa.map(x=>x.kelas)
+)
+];
 
 
 kelas.sort();
 
 
+
 kelas.forEach(k=>{
 
 
-let option=document.createElement("option");
+const option =
+document.createElement("option");
+
 
 option.value=k;
 
-option.text=k;
+option.textContent=k;
 
 
 select.appendChild(option);
@@ -287,29 +304,33 @@ select.appendChild(option);
 
 
 
+
 function tampilkan(){
 
 
-const filter =
+const kelas =
 document.getElementById("filterKelas").value;
 
 
 const cari =
-document.getElementById("search").value.toLowerCase();
+document.getElementById("search").value
+.toLowerCase();
 
 
 
 let data =
-dataSiswa.filter(x=>{
+dataSiswa.filter(s=>{
 
 
 return (
 
-(filter=="" || x.kelas==filter)
+(kelas=="" || s.kelas==kelas)
 
 &&
 
-x.nama.toLowerCase().includes(cari)
+s.nama
+.toLowerCase()
+.includes(cari)
 
 );
 
@@ -327,6 +348,7 @@ a.nama.localeCompare(b.nama)
 buatTabel(data);
 
 
+
 }
 
 
@@ -337,8 +359,15 @@ function buatTabel(data){
 
 if(data.length==0){
 
-document.getElementById("tbody").innerHTML =
-"<tr><td>Tidak ada data</td></tr>";
+document.getElementById("tbody").innerHTML=
+
+`
+<tr>
+<td>
+Data kosong
+</td>
+</tr>
+`;
 
 return;
 
@@ -346,13 +375,14 @@ return;
 
 
 
-let kegiatan = Object.keys(
+const kegiatan =
+Object.keys(
 data[0].kegiatan
 );
 
 
 
-let head = `
+let header = `
 
 <tr>
 
@@ -368,31 +398,37 @@ let head = `
 
 kegiatan.forEach(k=>{
 
-head+=`
+header +=
+
+`
 <th>${k}</th>
 `;
 
 });
 
 
-head+="</tr>";
-
-
-document.getElementById("thead").innerHTML=head;
+header += "</tr>";
 
 
 
-let body="";
+document.getElementById("thead").innerHTML =
+header;
 
 
-data.forEach((s,i)=>{
 
 
-body+=`
+let isi="";
+
+
+
+data.forEach((s,index)=>{
+
+
+isi += `
 
 <tr>
 
-<td>${i+1}</td>
+<td>${index+1}</td>
 
 <td class="nama">
 ${s.nama}
@@ -409,18 +445,23 @@ ${s.kelas}
 kegiatan.forEach(k=>{
 
 
-let d=s.kegiatan[k];
+const d=s.kegiatan[k];
 
 
-body+=`
 
-<td class="${warnaStatus(d.status)}">
+isi +=
+
+`
+
+<td class="${warna(d.status)}">
 
 ${d.status}
 
 <br>
 
-<small>${d.jam}</small>
+<small>
+${d.jam}
+</small>
 
 </td>
 
@@ -429,21 +470,25 @@ ${d.status}
 });
 
 
-body+="</tr>";
+isi += "</tr>";
+
 
 
 });
 
 
 
-document.getElementById("tbody").innerHTML=body;
+document.getElementById("tbody").innerHTML=
+isi;
+
 
 
 }
 
 
 
-function warnaStatus(status){
+
+function warna(status){
 
 
 status=status.toLowerCase();
@@ -453,15 +498,7 @@ if(status.includes("hadir"))
 return "hadir";
 
 
-if(status.includes("terlambat"))
-return "terlambat";
-
-
-if(
-status.includes("alpa")
-||
-status.includes("tidak")
-)
+if(status.includes("alpa"))
 return "alpa";
 
 
@@ -469,9 +506,14 @@ if(status.includes("dispensasi"))
 return "dispensasi";
 
 
+if(status.includes("terlambat"))
+return "terlambat";
+
+
 return "";
 
 }
+
 
 
 
