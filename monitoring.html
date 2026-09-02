@@ -217,8 +217,11 @@ action:"publicMonitoring"
 });
 
 
-const hasil = await response.json();
-console.log(hasil);
+const text = await response.text();
+
+alert(text);
+
+const hasil = JSON.parse(text);
 
 
 if(!hasil.berhasil){
